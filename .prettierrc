@@ -1,0 +1,10 @@
+{
+  "vetur.format.options.tabSize": 2,
+  "vetur.format.options.useTabs": false,
+  "tabWidth": 2,
+  "singleQuote": true,
+  "semi": true,
+  "printWidth": 100,
+  "bracketSpacing": true,
+  "trailingComma": "all"
+}
