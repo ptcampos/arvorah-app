@@ -59,7 +59,7 @@
               <p class="text-center q-mt-sm">
                 Ainda não tem conta?
                 <q-btn
-                  @click="$router.push({ path: '/signup', query: { type: accountType } })"
+                  @click="goToTypeRegister"
                   style="margin-top: -2px"
                   color="primary"
                   label="Registrar"
@@ -105,6 +105,12 @@ export default {
       } finally {
         this.$q.loading.hide();
       }
+    },
+    goToTypeRegister() {
+      if (this.accountType === 'professional') {
+        return this.$router.push({ path: '/signup-professional', query: { type: 'professional' } });
+      }
+      return this.$router.push({ path: '/signup', query: { type: 'client' } });
     },
   },
 

@@ -5,7 +5,7 @@
       <div class="row q-mt-lg q-pl-lg q-pr-lg q-pt-lg">
         <div class="offset-sm-4 col-sm-4 col-xs-12">
           <div class="title">
-            Cadastro {{ accountTypeFormatted }}
+            Cadastro Paciente
             <div class="title-destaque">Preencha os campos abaixo para iniciar</div>
           </div>
         </div>
@@ -59,7 +59,7 @@
               <p class="text-center q-mt-sm">
                 Já tem conta?
                 <q-btn
-                  @click="$router.push({ path: '/login', query: { type: accountType } })"
+                  @click="$router.push({ path: '/login', query: { type: 'client' } })"
                   style="margin-top: -2px"
                   color="primary"
                   label="Entrar"
@@ -99,14 +99,20 @@ export default {
       this.$q.loading.show();
       try {
         await this.$store.dispatch('user/signup', {
-          accountType: this.accountType,
+          accountType: 'client',
           ...this.user,
         });
         this.$q.notify({
           message: 'Sua conta foi criada com sucesso',
           color: 'positive',
         });
-        this.$router.push({ path: '/login', query: { type: this.accountType } });
+        await this.$store.dispatch('user/authenticate', {
+          accountType: 'client',
+          email: this.user.email,
+          password: this.user.password,
+        });
+        this.$router.push('/app');
+        // this.$router.push({ path: '/login', query: { type: 'client' } });
       } catch (error) {
         let message = 'Erro ao criar a sua Conta';
         if (
@@ -129,25 +135,7 @@ export default {
     },
   },
 
-  computed: {
-    accountType() {
-      const { query } = this.$route;
-      return query.type || '';
-    },
-    accountTypeFormatted() {
-      if (!this.accountType) {
-        return '';
-      }
-      switch (this.accountType) {
-        case 'client':
-          return 'Paciente';
-        case 'professional':
-          return 'Profissional';
-        default:
-          return '';
-      }
-    },
-  },
+  computed: {},
 };
 </script>
 
