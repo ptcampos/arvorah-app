@@ -11,6 +11,7 @@ const routes = [
       { path: 'account-type', name: 'auth', component: () => import('pages/auth/AccountType.vue') },
       { path: 'login', component: () => import('pages/auth/Login.vue') },
       { path: 'signup', component: () => import('pages/auth/Signup.vue') },
+      { path: 'signup-professional', component: () => import('pages/auth/SignupProfessional.vue') },
       { path: 'forgot-password', component: () => import('pages/auth/ForgotPassword.vue') },
     ],
   },

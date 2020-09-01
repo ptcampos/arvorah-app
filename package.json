@@ -11,9 +11,14 @@
     "dev": "quasar dev"
   },
   "dependencies": {
+    "@fnando/cnpj": "^1.0.2",
+    "@fnando/cpf": "^1.0.2",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
     "core-js": "^3.6.5",
+    "email-validator": "^2.0.4",
+    "lodash": "^4.17.20",
+    "moment": "^2.27.0",
     "quasar": "^1.0.0"
   },
   "devDependencies": {

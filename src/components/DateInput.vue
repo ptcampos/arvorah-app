@@ -1,0 +1,65 @@
+<template>
+  <q-input
+    :label="label"
+    :rules="[
+      val => !!checkRequired(val) || 'Campo obrigatório',
+      val => !!isValidDate(val) || 'Data Inválida',
+    ]"
+    :mask="mask || '##/##/####'"
+    :dense="dense"
+    type="tel"
+    outlined
+    :value="value"
+    v-on:input="updateValue($event)"
+    hide-bottom-space
+    :required="required"
+    bg-color="grey-2"
+  />
+</template>
+
+<script>
+import { isValidDate } from 'boot/utils';
+
+export default {
+  props: {
+    mask: {
+      type: String,
+      required: false,
+    },
+    label: {
+      type: String,
+      required: false,
+    },
+    dense: {
+      type: Boolean,
+      default: false,
+    },
+    value: {
+      type: String,
+    },
+    required: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
+  methods: {
+    isValidDate,
+    updateValue($event) {
+      // console.log($event)
+      this.$emit('input', $event);
+    },
+    checkRequired(val) {
+      if (!this.required) {
+        return true;
+      }
+      if (this.required && !val) {
+        return false;
+      }
+      return true;
+    },
+  },
+};
+</script>
+
+<style></style>
