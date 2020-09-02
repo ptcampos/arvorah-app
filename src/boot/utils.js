@@ -197,3 +197,7 @@ export const isValidDate = (stringDate, format = 'DD/MM/YYYY') => {
   const valid = moment(stringDate, format).isValid();
   return valid;
 };
+
+export const goBack = () => {
+  window.history.back();
+};

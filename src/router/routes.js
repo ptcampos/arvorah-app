@@ -16,11 +16,34 @@ const routes = [
     ],
   },
   {
+    path: '/plan-subscription',
+    redirect: '/select',
+    name: 'planSubscription',
+    component: () => import('layouts/BlankLayout.vue'),
+    children: [
+      {
+        path: 'select',
+        name: 'planSubscriptionSelect',
+        component: () => import('pages/plans/SelectPlan.vue'),
+      },
+      {
+        path: 'select/:planType',
+        name: 'planSubscriptionConfirm',
+        props: true,
+        component: () => import('pages/plans/PlanDetails.vue'),
+      },
+    ],
+  },
+  {
     path: '/app',
     component: () => import('layouts/MainLayout.vue'),
     redirect: () => {
       const user = UserService.getUser();
       if (user && user.data && user.data.roles === 'user') {
+        const userPlan = UserService.getUserPlan();
+        if (!userPlan) {
+          return '/plan-subscription/select';
+        }
         return '/app/client/home';
       }
       return '/app/professional/home';
