@@ -52,7 +52,7 @@ const routes = [
       {
         path: 'client/home',
         meta: { requiresAuth: true, allowedUsers: ['user'] },
-        component: () => import('pages/Index.vue'),
+        component: () => import('pages/clients/Home.vue'),
       },
       {
         path: 'professional/home',
