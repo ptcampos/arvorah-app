@@ -4,7 +4,7 @@ import { Notify } from 'quasar';
 
 import routes from './routes';
 
-import { getUser } from '../services/User';
+import { getUser, getUserPlan } from '../services/User';
 
 Vue.use(VueRouter);
 
@@ -31,7 +31,15 @@ export default function(/* { store, ssrContext } */) {
 
   Router.beforeEach((to, from, next) => {
     const user = getUser();
+    const userPlan = getUserPlan();
     if (user && to.name === 'default') {
+      return next('/app');
+    }
+    if (
+      user &&
+      userPlan &&
+      (to.name === 'planSubscriptionSelect' || to.name === 'planSubscriptionConfirm')
+    ) {
       return next('/app');
     }
     if (user && to.matched && to.matched.length && to.matched[0].name === 'default') {
