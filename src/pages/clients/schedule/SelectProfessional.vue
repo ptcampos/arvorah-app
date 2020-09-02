@@ -129,12 +129,11 @@ export default {
         ...a,
         selected: index === payload.index && !payload.option.selected,
       }));
-      const allProfessionals = copy(professionalsExample);
       if (payload.option.selected) {
-        this.professionalsToShow = allProfessionals;
+        this.professionalsToShow = copy(professionalsExample);
         return;
       }
-      this.professionalsToShow = allProfessionals.filter(
+      this.professionalsToShow = professionalsExample.filter(
         p => p.healthArea === payload.option.value,
       );
     },

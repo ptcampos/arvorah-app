@@ -66,6 +66,12 @@ const routes = [
         component: () => import('pages/clients/schedule/SelectDate.vue'),
       },
       {
+        path: 'client/schedule-select-hour/:professionalId/:date',
+        props: true,
+        meta: { requiresAuth: true, allowedUsers: ['user'] },
+        component: () => import('pages/clients/schedule/SelectHour.vue'),
+      },
+      {
         path: 'professional/home',
         meta: { requiresAuth: true, allowedUsers: ['professional'] },
         component: () => import('pages/Index.vue'),

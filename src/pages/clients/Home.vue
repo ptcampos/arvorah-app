@@ -33,7 +33,7 @@
           align="left"
           no-caps
           class="full-width"
-          color="teal"
+          color="cyan"
         >
           <q-icon left size="3em" :name="ionBookmarksOutline" />
           <div>Compromissos</div>
@@ -46,7 +46,7 @@
           align="left"
           no-caps
           class="full-width"
-          color="teal"
+          color="secondary"
         >
           <q-icon left size="3em" :name="ionNotificationsOutline" />
           <div>Notificações</div>

@@ -1,5 +1,5 @@
 export default ({ Vue }) => {
-  Vue.filter('currency', function(value, currency = 'R$ ') {
+  Vue.filter('currency', (value, currency = 'R$ ') => {
     if (!value) return `${currency}0,00`;
     return `${currency}${value.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,

@@ -10,7 +10,12 @@
     </transition>
   </div>
 </template>
+
 <script>
+import moment from 'moment';
+
+moment.locale('pt-BR');
+
 export default {
   name: 'App',
 };

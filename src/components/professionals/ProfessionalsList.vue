@@ -10,8 +10,8 @@
     >
       <ProfessionalItem
         :professional="professional"
-        :key="index"
-        v-for="(professional, index) in professionals"
+        :key="professional.id"
+        v-for="professional in professionals"
         @onClick="$emit('onClickItem', professional)"
       />
     </transition-group>
