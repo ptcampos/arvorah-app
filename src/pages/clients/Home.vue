@@ -20,6 +20,7 @@
           no-caps
           class="full-width"
           color="teal"
+          to="/app/client/schedule-select-professional"
         >
           <q-icon left size="3em" :name="ionCalendarOutline" />
           <div>Agendar Consulta</div>
@@ -78,6 +79,10 @@ export default {
       ionBookmarksOutline,
       ionNotificationsOutline,
     };
+  },
+
+  mounted() {
+    this.$root.$emit('changeTitle');
   },
 };
 </script>
