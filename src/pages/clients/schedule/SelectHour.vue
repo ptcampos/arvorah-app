@@ -12,6 +12,33 @@
         </div>
       </div>
       <div class="col-xs-12">
+        <HourSelectionBox
+          period="Manhã"
+          colorFrom="#FFFA8F"
+          colorTo="#FFF394"
+          :availableHours="availableHours.morning"
+          @hourSelected="val => onHourSelected(val, 'morning')"
+        />
+      </div>
+      <div class="col-xs-12">
+        <HourSelectionBox
+          period="Tarde"
+          colorFrom="#D8C8FC"
+          colorTo="#B2FDEF"
+          :availableHours="availableHours.afternoon"
+          @hourSelected="val => onHourSelected(val, 'afternoon')"
+        />
+      </div>
+      <div class="col-xs-12">
+        <HourSelectionBox
+          period="Noite"
+          colorFrom="#78E1FC"
+          colorTo="#85FEF3"
+          :availableHours="availableHours.night"
+          @hourSelected="val => onHourSelected(val, 'night')"
+        />
+      </div>
+      <div class="col-xs-12">
         <q-btn
           @click="confirmSchedule"
           label="Marcar Consulta"
@@ -28,6 +55,7 @@
 import moment from 'moment';
 
 import ProfessionalItem from 'components/professionals/ProfessionalItem';
+import HourSelectionBox from 'components/hour-selection/HourSelectionBox';
 
 export default {
   props: {
@@ -43,14 +71,23 @@ export default {
 
   components: {
     ProfessionalItem,
+    HourSelectionBox,
   },
 
   data() {
     return {
       professional: {},
       selectedHour: null,
-      availableHours: [],
       initialDate: this.date,
+      availableHours: {
+        morning: [
+          { description: '10:00' },
+          { description: '11:00', selected: true },
+          { description: '11:30' },
+        ],
+        afternoon: [{ description: '12:00' }, { description: '12:30' }, { description: '13:00' }],
+        night: [{ description: '19:00' }, { description: '19:30' }, { description: '20:00' }],
+      },
     };
   },
 
@@ -70,7 +107,29 @@ export default {
   },
 
   methods: {
+    clearAllHours() {
+      this.availableHours.morning = this.availableHours.morning.map(h => ({
+        ...h,
+        selected: false,
+      }));
+      this.availableHours.afternoon = this.availableHours.afternoon.map(h => ({
+        ...h,
+        selected: false,
+      }));
+      this.availableHours.night = this.availableHours.night.map(h => ({
+        ...h,
+        selected: false,
+      }));
+    },
+    onHourSelected(hour, period) {
+      this.clearAllHours();
+      this.availableHours[period] = this.availableHours[period].map(h => ({
+        ...h,
+        selected: hour.description === h.description,
+      }));
+    },
     moveDate(to) {
+      this.clearAllHours();
       if (to === 'up') {
         this.initialDate = moment(this.initialDate, 'DD_MM_YYYY')
           .add(1, 'day')
