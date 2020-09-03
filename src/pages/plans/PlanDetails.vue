@@ -30,7 +30,7 @@
                 <q-btn
                   @click="subscribeToPlan"
                   label="Assinar"
-                  color="primary"
+                  color="secondary"
                   rounded
                   style="padding: 0 40px"
                   size="lg"

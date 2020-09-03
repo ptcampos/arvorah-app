@@ -6,18 +6,36 @@
           flat
           dense
           round
-          icon="menu"
+          :icon="ionMenuOutline"
           aria-label="Menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
+          v-if="!isInternalPage"
         />
 
-        <q-toolbar-title>
-          Saude Integrativa
+        <q-btn
+          flat
+          dense
+          round
+          icon="eva-arrow-ios-back-outline"
+          aria-label="Go Back"
+          @click="goBack"
+          v-if="isInternalPage"
+        />
+
+        <q-toolbar-title class="row items-center">
+          <span class="text-subtitle2">{{ pageTitle }}</span>
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered content-class="bg-grey-1">
+    <q-drawer
+      :no-swipe-open="isInternalPage"
+      :no-swipe-close="isInternalPage"
+      v-model="leftDrawerOpen"
+      show-if-above
+      bordered
+      content-class="bg-grey-1"
+    >
       <q-list>
         <q-item-label header class="text-grey-8">
           Menu
@@ -43,17 +61,20 @@
 
 <script>
 import EssentialLink from 'components/EssentialLink.vue';
+import { ionMenuOutline } from '@quasar/extras/ionicons-v5';
+
+import { goBack } from 'boot/utils';
 
 const linksData = [
   {
     title: 'Home',
     icon: 'eva-home-outline',
-    link: '/app',
+    link: '/app/client/home',
   },
   {
     title: 'Agendar Consulta',
     icon: 'eva-book-outline',
-    link: '/app/client/schedule',
+    link: '/app/client/schedule-select-professional',
   },
   {
     title: 'Compromissos',
@@ -82,12 +103,26 @@ export default {
   components: { EssentialLink },
   data() {
     return {
+      pageTitle: 'Saúde Integrativa',
+      ionMenuOutline,
+      isInternalPage: false,
       leftDrawerOpen: false,
       essentialLinks: linksData,
     };
   },
 
+  mounted() {
+    this.$root.$on('internalPage', isInternalPage => {
+      this.isInternalPage = isInternalPage;
+    });
+
+    this.$root.$on('changeTitle', title => {
+      this.pageTitle = title || 'Saúde Integrativa';
+    });
+  },
+
   methods: {
+    goBack,
     signOut() {
       this.$store.dispatch('user/signOut');
       this.$router.push('/account-type');

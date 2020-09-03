@@ -201,3 +201,7 @@ export const isValidDate = (stringDate, format = 'DD/MM/YYYY') => {
 export const goBack = () => {
   window.history.back();
 };
+
+export const copy = obj => {
+  return JSON.parse(JSON.stringify(obj));
+};
