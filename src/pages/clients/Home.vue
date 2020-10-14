@@ -1,10 +1,22 @@
 <template>
   <q-page padding>
     <div class="row q-col-gutter-md">
+      <!-- <div class="col-xs-12">
+        <q-card flat bordered class="my-card">
+          <q-card-section>
+            <div class="text-h6"><q-icon :name="ionNewspaperOutline" /> Últimas Notícias</div>
+          </q-card-section>
+
+          <q-card-section class="q-pa-none">
+            <NewsCarousel />
+          </q-card-section>
+        </q-card>
+      </div> -->
+
       <div class="col-xs-12">
         <q-card flat bordered class="my-card">
           <q-card-section>
-            <div class="text-h6"><q-icon :name="ionNewspaperOutline" /> Notícias</div>
+            <div class="text-h6"><q-icon :name="ionCalendarOutline" /> Ciclo Atual</div>
           </q-card-section>
 
           <q-card-section class="q-pa-none">
@@ -12,46 +24,6 @@
           </q-card-section>
         </q-card>
       </div>
-      <!-- <div class="col-xs-12">
-        <q-btn
-          style="padding: 10px 10px"
-          outline
-          align="left"
-          no-caps
-          class="full-width"
-          color="teal"
-          to="/app/client/schedule-select-professional"
-        >
-          <q-icon left size="3em" :name="ionCalendarOutline" />
-          <div>Agendar Consulta</div>
-        </q-btn>
-      </div>
-      <div class="col-xs-12">
-        <q-btn
-          style="padding: 10px 10px"
-          outline
-          align="left"
-          no-caps
-          class="full-width"
-          color="cyan"
-        >
-          <q-icon left size="3em" :name="ionBookmarksOutline" />
-          <div>Compromissos</div>
-        </q-btn>
-      </div>
-      <div class="col-xs-12">
-        <q-btn
-          style="padding: 10px 10px"
-          outline
-          align="left"
-          no-caps
-          class="full-width"
-          color="secondary"
-        >
-          <q-icon left size="3em" :name="ionNotificationsOutline" />
-          <div>Notificações</div>
-        </q-btn>
-      </div> -->
     </div>
   </q-page>
 </template>
@@ -78,11 +50,50 @@ export default {
       ionCalendarOutline,
       ionBookmarksOutline,
       ionNotificationsOutline,
+      currentCycle: {},
     };
   },
 
   mounted() {
     this.$root.$emit('changeTitle');
+    // get current user cycle. if any, show modal
+    this.init();
+  },
+
+  methods: {
+    showPrincipaisDoresModal() {
+      setTimeout(() => {
+        this.$root.$emit('showModal', 'principaisDores');
+      }, 100);
+    },
+    async init() {
+      this.$q.loading.show();
+      try {
+        const currentUserCycle = await this.$store.dispatch('cycle/getUserCycle');
+        if (!currentUserCycle || !currentUserCycle.active) {
+          this.showPrincipaisDoresModal();
+        } else {
+          this.currentCycle = currentUserCycle;
+        }
+      } catch (error) {
+        let errorReason = '';
+        if (
+          error &&
+          error.response &&
+          error.response.data &&
+          error.response.data.result &&
+          error.response.data.result.error
+        ) {
+          errorReason = error.response.data.result.error;
+        }
+        this.$q.notify({
+          message: `Erro ao recuperar as informações do ciclo ${errorReason}`,
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
   },
 };
 </script>

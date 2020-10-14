@@ -56,11 +56,16 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <PrincipaisDoresModal :show="principaisDoresModal" />
+    <CronogramaDoCicloModal :show="cronogramaDoCicloModal" />
   </q-layout>
 </template>
 
 <script>
 import EssentialLink from 'components/EssentialLink.vue';
+import PrincipaisDoresModal from 'components/modals/PrincipaisDoresModal.vue';
+import CronogramaDoCicloModal from 'components/modals/CronogramaDoCicloModal.vue';
 import { ionMenuOutline } from '@quasar/extras/ionicons-v5';
 
 import { goBack } from 'boot/utils';
@@ -100,7 +105,7 @@ const linksData = [
 
 export default {
   name: 'MainLayout',
-  components: { EssentialLink },
+  components: { EssentialLink, PrincipaisDoresModal, CronogramaDoCicloModal },
   data() {
     return {
       pageTitle: 'Saúde Integrativa',
@@ -108,6 +113,8 @@ export default {
       isInternalPage: false,
       leftDrawerOpen: false,
       essentialLinks: linksData,
+      principaisDoresModal: false,
+      cronogramaDoCicloModal: false,
     };
   },
 
@@ -118,6 +125,18 @@ export default {
 
     this.$root.$on('changeTitle', title => {
       this.pageTitle = title || 'Saúde Integrativa';
+    });
+
+    this.$root.$on('showModal', name => {
+      if (this[`${name}Modal`] !== undefined) {
+        this[`${name}Modal`] = true;
+      }
+    });
+
+    this.$root.$on('hideModal', name => {
+      if (this[`${name}Modal`] !== undefined) {
+        this[`${name}Modal`] = false;
+      }
     });
   },
 

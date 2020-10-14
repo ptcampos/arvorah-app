@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 import user from './user';
+import cycle from './cycle';
 
 Vue.use(Vuex);
 
@@ -18,6 +19,7 @@ export default function(/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
       user,
+      cycle,
     },
 
     // enable strict mode (adds overhead!)
