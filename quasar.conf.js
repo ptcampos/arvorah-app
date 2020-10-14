@@ -11,7 +11,7 @@
 
 module.exports = function(ctx) {
   const devEnvs = {
-    API_URL: 'http://localhost:3050/api/v1/',
+    API_URL: 'http://192.168.1.183:3050/api/v1/',
     // API_URL: '"https://manuais-normativos-api.thriade.com/api/v1/"'
   };
   const prodEnvs = {
@@ -173,7 +173,7 @@ module.exports = function(ctx) {
 
     // Full list of options: https://quasar.dev/quasar-cli/developing-capacitor-apps/configuring-capacitor
     capacitor: {
-      hideSplashscreen: true,
+      hideSplashscreen: false,
     },
 
     // Full list of options: https://quasar.dev/quasar-cli/developing-electron-apps/configuring-electron

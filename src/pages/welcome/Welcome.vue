@@ -11,7 +11,7 @@
     </div>
     <div class="btn-container">
       <q-btn
-        @click="$router.push('/account-type')"
+        @click="$router.push({ path: '/login', query: { type: 'client' } })"
         color="secondary"
         round
         class="full-width"

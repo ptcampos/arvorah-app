@@ -57,6 +57,18 @@
                 color="secondary"
               />
               <p class="text-center q-mt-sm">
+                Ao se cadastrar você aceita com os nossos
+                <q-btn
+                  @click="openExternalURL('http://google.com')"
+                  style="margin-top: -2px"
+                  color="primary"
+                  label="Termos e Condições"
+                  no-caps
+                  flat
+                  dense
+                />
+              </p>
+              <p class="text-center q-mt-sm">
                 Já tem conta?
                 <q-btn
                   @click="$router.push({ path: '/login', query: { type: 'client' } })"
@@ -77,6 +89,8 @@
 </template>
 
 <script>
+import { openExternalURL } from 'boot/utils';
+
 export default {
   data() {
     return {
@@ -88,7 +102,10 @@ export default {
     };
   },
 
+  mounted() {},
+
   methods: {
+    openExternalURL,
     goBack() {
       window.history.back();
     },

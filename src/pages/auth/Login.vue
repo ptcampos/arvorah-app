@@ -1,12 +1,12 @@
 <template>
   <q-page padding class="bg">
-    <q-btn
+    <!-- <q-btn
       icon="eva-arrow-ios-back-outline"
       size="16px"
-      @click="$router.push('/account-type')"
+      @click="$router.push({ path: '/login', query: { type: 'client' } })"
       :ripple="false"
       flat
-    />
+    /> -->
     <q-form @submit="submit">
       <div class="row q-mt-lg q-pl-lg q-pr-lg q-pt-lg">
         <div class="offset-sm-4 col-sm-4 col-xs-12">
@@ -85,6 +85,14 @@ export default {
         password: '',
       },
     };
+  },
+
+  mounted() {
+    const { query } = this.$route;
+
+    if (!query || !query.type) {
+      this.$router.push({ path: 'login', query: { type: 'client' } });
+    }
   },
 
   methods: {

@@ -46,7 +46,7 @@ export default function(/* { store, ssrContext } */) {
       return next('/app');
     }
     if (!user && to.meta.requiresAuth) {
-      return next('/account-type');
+      return next({ path: '/login', query: { type: 'client' } });
     }
     if (!to.meta.allowedUsers) {
       return next();

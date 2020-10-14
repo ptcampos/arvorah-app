@@ -40,10 +40,10 @@ const routes = [
     redirect: () => {
       const user = UserService.getUser();
       if (user && user.data && user.data.roles === 'user') {
-        const userPlan = UserService.getUserPlan();
-        if (!userPlan) {
-          return '/plan-subscription/select';
-        }
+        // const userPlan = UserService.getUserPlan();
+        // if (!userPlan) {
+        //   return '/plan-subscription/select';
+        // }
         return '/app/client/home';
       }
       return '/app/professional/home';

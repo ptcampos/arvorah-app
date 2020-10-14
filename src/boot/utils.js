@@ -5,6 +5,10 @@ import { isValid as isValidCnpj, format as formatCnpj } from '@fnando/cnpj';
 import { isValid as isValidCpf, format as formatCpf } from '@fnando/cpf';
 import emailValidator from 'email-validator';
 
+import { Plugins } from '@capacitor/core';
+
+const { Browser } = Plugins;
+
 export const formatId = id => {
   return _.padStart(id, 7, '0');
 };
@@ -204,4 +208,8 @@ export const goBack = () => {
 
 export const copy = obj => {
   return JSON.parse(JSON.stringify(obj));
+};
+
+export const openExternalURL = url => {
+  Browser.open({ url });
 };

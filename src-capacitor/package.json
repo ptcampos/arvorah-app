@@ -1,0 +1,11 @@
+{
+  "name": "saude-integrativa-app",
+  "version": "0.0.1",
+  "description": "An App to help people organize their health life",
+  "author": "Grupo TNS - Paulo Campos <paulo@thriade.com>",
+  "private": true,
+  "dependencies": {
+    "@capacitor/cli": "^2.0.0",
+    "@capacitor/core": "^2.0.0"
+  }
+}

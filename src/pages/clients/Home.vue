@@ -12,7 +12,7 @@
           </q-card-section>
         </q-card>
       </div>
-      <div class="col-xs-12">
+      <!-- <div class="col-xs-12">
         <q-btn
           style="padding: 10px 10px"
           outline
@@ -51,7 +51,7 @@
           <q-icon left size="3em" :name="ionNotificationsOutline" />
           <div>Notificações</div>
         </q-btn>
-      </div>
+      </div> -->
     </div>
   </q-page>
 </template>

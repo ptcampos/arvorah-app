@@ -71,26 +71,26 @@ const linksData = [
     icon: 'eva-home-outline',
     link: '/app/client/home',
   },
-  {
-    title: 'Agendar Consulta',
-    icon: 'eva-book-outline',
-    link: '/app/client/schedule-select-professional',
-  },
-  {
-    title: 'Compromissos',
-    icon: 'eva-calendar-outline',
-    link: '/app/client/compromises',
-  },
-  {
-    title: 'Notificações',
-    icon: 'eva-bell-outline',
-    link: '/app/client/notifications',
-  },
-  {
-    title: 'Notícias',
-    icon: 'eva-clipboard-outline',
-    link: '/app/client/news',
-  },
+  // {
+  //   title: 'Agendar Consulta',
+  //   icon: 'eva-book-outline',
+  //   link: '/app/client/schedule-select-professional',
+  // },
+  // {
+  //   title: 'Compromissos',
+  //   icon: 'eva-calendar-outline',
+  //   link: '/app/client/compromises',
+  // },
+  // {
+  //   title: 'Notificações',
+  //   icon: 'eva-bell-outline',
+  //   link: '/app/client/notifications',
+  // },
+  // {
+  //   title: 'Notícias',
+  //   icon: 'eva-clipboard-outline',
+  //   link: '/app/client/news',
+  // },
   {
     title: 'Configurações',
     icon: 'eva-settings-outline',
@@ -125,7 +125,7 @@ export default {
     goBack,
     signOut() {
       this.$store.dispatch('user/signOut');
-      this.$router.push('/account-type');
+      this.$router.push({ path: '/login', query: { type: 'client' } });
     },
   },
 };
