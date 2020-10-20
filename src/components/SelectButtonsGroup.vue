@@ -1,10 +1,10 @@
 <template>
-  <div class="row q-col-gutter-sm justify-center">
-    <div :key="index" v-for="(option, index) in options">
+  <div class="row q-col-gutter-sm">
+    <div class="col" :key="index" v-for="(option, index) in options">
       <q-btn
         :color="option.selected ? 'teal' : 'teal-1'"
         :text-color="option.selected ? 'white' : 'black'"
-        style="padding: 10px 0"
+        style="padding: 10px 0; width: 100%; min-height: 120px;"
         no-caps
         @click="$emit('onClick', { option, index })"
       >

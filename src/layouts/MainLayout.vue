@@ -91,11 +91,11 @@ const linksData = [
   //   icon: 'eva-bell-outline',
   //   link: '/app/client/notifications',
   // },
-  // {
-  //   title: 'Notícias',
-  //   icon: 'eva-clipboard-outline',
-  //   link: '/app/client/news',
-  // },
+  {
+    title: 'Conteúdo Informativo',
+    icon: 'eva-clipboard-outline',
+    link: '/app/client/informative-content',
+  },
   {
     title: 'Configurações',
     icon: 'eva-settings-outline',

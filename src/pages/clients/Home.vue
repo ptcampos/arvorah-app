@@ -19,8 +19,55 @@
             <div class="text-h6"><q-icon :name="ionCalendarOutline" /> Ciclo Atual</div>
           </q-card-section>
 
+          <q-separator />
+
           <q-card-section class="q-pa-none">
-            <NewsCarousel />
+            <div class="row q-col-gutter-md">
+              <div class="col-xs-12">
+                <q-list>
+                  <q-item tag="label">
+                    <q-item-section>
+                      <q-item-label>Início:</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      {{ currentCycle.startDate | date('DD/MM/YYYY') }}
+                    </q-item-section>
+                  </q-item>
+                  <q-item tag="label">
+                    <q-item-section>
+                      <q-item-label>Fim:</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      {{ currentCycle.endDate | date('DD/MM/YYYY') }}
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </div>
+            </div>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-section>
+            <div class="row q-col-gutter-md">
+              <div class="col-xs-12">
+                <q-btn
+                  icon="eva-clipboard-outline"
+                  color="primary"
+                  class="full-width"
+                  label="Conteúdo Informativo"
+                  @click="$router.push({ path: '/app/client/informative-content' })"
+                />
+                <q-btn
+                  icon="eva-calendar"
+                  flat
+                  color="primary"
+                  class="q-mt-sm full-width"
+                  label="Cronograma"
+                  @click="$root.$emit('showModal', 'cronogramaDoCiclo')"
+                />
+              </div>
+            </div>
           </q-card-section>
         </q-card>
       </div>
@@ -29,7 +76,7 @@
 </template>
 
 <script>
-import NewsCarousel from 'components/news/NewsCarousel';
+// import NewsCarousel from 'components/news/NewsCarousel';
 import {
   ionNewspaperOutline,
   ionCalendarOutline,
@@ -41,7 +88,7 @@ export default {
   name: 'PageClientHome',
 
   components: {
-    NewsCarousel,
+    // NewsCarousel,
   },
 
   data() {
@@ -55,9 +102,14 @@ export default {
   },
 
   mounted() {
+    this.$root.$emit('internalPage', false);
     this.$root.$emit('changeTitle');
     // get current user cycle. if any, show modal
     this.init();
+
+    this.$root.$on('refreshClientCurrentCycle', () => {
+      this.refreshCurrentCycle();
+    });
   },
 
   methods: {
@@ -66,7 +118,7 @@ export default {
         this.$root.$emit('showModal', 'principaisDores');
       }, 100);
     },
-    async init() {
+    async refreshCurrentCycle() {
       this.$q.loading.show();
       try {
         const currentUserCycle = await this.$store.dispatch('cycle/getUserCycle');
@@ -93,6 +145,9 @@ export default {
       } finally {
         this.$q.loading.hide();
       }
+    },
+    async init() {
+      this.refreshCurrentCycle();
     },
   },
 };

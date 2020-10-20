@@ -9,7 +9,7 @@
     <q-card class="text-primary">
       <q-card-section>
         <div class="text-h6">
-          Bem vindo ao Saúde Integrativa! Para começar, pode nos informar as suas Principais Dores?
+          Bem vindo ao Saúde Integrativa! Para começar, informe-nos as suas Principais Dores
         </div>
       </q-card-section>
 
@@ -48,7 +48,7 @@
 
       <q-card-section v-show="step === 'intensitySelect'">
         <div class="text-body text-bold">
-          Selecione as intensidades:
+          Quais as intensidades?
         </div>
         <div class="q-mt-sm row q-col-gutter-md">
           <div class="col-xs-12" :key="option.value" v-for="option in selectedPains">
@@ -184,6 +184,8 @@ export default {
           color: 'positive',
         });
         this.hideModal();
+        this.$root.$emit('refreshCycleCronogram');
+        this.$root.$emit('refreshClientCurrentCycle');
         this.$root.$emit('showModal', 'cronogramaDoCiclo');
       } catch (error) {
         let errorReason = '';

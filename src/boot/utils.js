@@ -213,3 +213,49 @@ export const copy = obj => {
 export const openExternalURL = url => {
   Browser.open({ url });
 };
+
+export const painDescription = pain => {
+  switch (pain) {
+    case 'comer_bem':
+      return 'Comer Bem';
+    case 'efeitos_colaterais':
+      return 'Efeitos Colaterais';
+    case 'espiritualidade':
+      return 'Espiritualidade';
+    case 'lidar_com_emocoes':
+      return 'Lidar com Emoções';
+    case 'me_exercitar':
+      return 'Me Exercitar';
+    case 'meus_direitos':
+      return 'Meus Direitos';
+    case 'sexualidade':
+      return 'Sexualidade';
+    case 'vida_apos_cancer':
+      return 'Vida Após o Câncer';
+    default:
+      return pain;
+  }
+};
+
+export const painIcon = pain => {
+  switch (pain) {
+    case 'comer_bem':
+      return 'img:icons/fruit.svg';
+    case 'efeitos_colaterais':
+      return 'img:icons/side-effect.svg';
+    case 'espiritualidade':
+      return 'img:icons/pray.svg';
+    case 'lidar_com_emocoes':
+      return 'img:icons/emotions.svg';
+    case 'me_exercitar':
+      return 'img:icons/exercise.svg';
+    case 'meus_direitos':
+      return 'img:icons/auction.svg';
+    case 'sexualidade':
+      return 'img:icons/sexual.svg';
+    case 'vida_apos_cancer':
+      return 'img:icons/question.svg';
+    default:
+      return pain;
+  }
+};

@@ -55,6 +55,17 @@ const routes = [
         component: () => import('pages/clients/Home.vue'),
       },
       {
+        path: 'client/informative-content',
+        meta: { requiresAuth: true, allowedUsers: ['user'] },
+        component: () => import('pages/clients/informative-content/List.vue'),
+      },
+      {
+        path: 'client/informative-content/:informativeContentId',
+        props: true,
+        meta: { requiresAuth: true, allowedUsers: ['user'] },
+        component: () => import('pages/clients/informative-content/Details.vue'),
+      },
+      {
         path: 'client/schedule-select-professional',
         meta: { requiresAuth: true, allowedUsers: ['user'] },
         component: () => import('pages/clients/schedule/SelectProfessional.vue'),

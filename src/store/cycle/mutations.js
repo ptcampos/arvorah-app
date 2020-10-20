@@ -1,1 +1,3 @@
-export function someMutation(/* state */) {}
+export function setCurrentInformativeContent(state, item) {
+  state.currentInformativeContent = item;
+}
