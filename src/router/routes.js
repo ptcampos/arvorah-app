@@ -3,11 +3,10 @@ import * as UserService from '../services/User';
 const routes = [
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/signup',
     name: 'default',
     component: () => import('layouts/PublicLayout.vue'),
     children: [
-      { path: 'welcome', component: () => import('pages/welcome/Welcome.vue') },
       { path: 'account-type', name: 'auth', component: () => import('pages/auth/AccountType.vue') },
       { path: 'login', component: () => import('pages/auth/Login.vue') },
       { path: 'signup', component: () => import('pages/auth/Signup.vue') },

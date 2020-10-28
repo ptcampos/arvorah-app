@@ -4,7 +4,7 @@
       <div class="col-xs-12">
         <!-- <ProfessionalItem :professional="professional" /> -->
       </div>
-      <div class="col-xs-12">
+      <div class="col-xs-12" id="informative-content">
         <div class="text-body text-justify" v-html="informativeContent.content" />
         <!-- <q-date minimal flat class="full-width" v-model="date" :options="dateOptions" /> -->
         <q-separator class="q-mb-sm" />
@@ -40,7 +40,7 @@
 
 <script>
 // import ProfessionalItem from 'components/professionals/ProfessionalItem';
-// import { goBack } from 'boot/utils';
+import { openExternalURL } from 'boot/utils';
 
 export default {
   props: {
@@ -76,6 +76,18 @@ export default {
         this.$store.dispatch('cycle/saveInformativeContentOpenedDate', this.informativeContentId);
       }
       this.nps.intensity = this.informativeContent.rating || 10;
+
+      const myElementToCheckIfClicksAreInsideOf = document.querySelector('#informative-content');
+      document.body.addEventListener('click', event => {
+        if (
+          myElementToCheckIfClicksAreInsideOf.contains(event.target) &&
+          event.target.tagName.toLowerCase() === 'a'
+        ) {
+          event.preventDefault();
+          openExternalURL(event.target.href);
+        }
+      });
+
       return 1;
     }, 1);
   },

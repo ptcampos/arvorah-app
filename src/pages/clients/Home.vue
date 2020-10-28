@@ -41,6 +41,14 @@
                       {{ currentCycle.endDate | date('DD/MM/YYYY') }}
                     </q-item-section>
                   </q-item>
+                  <q-item tag="label">
+                    <q-item-section>
+                      <q-item-label>Navegador:</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-badge color="grey">Buscando o mais adequado</q-badge>
+                    </q-item-section>
+                  </q-item>
                 </q-list>
               </div>
             </div>
