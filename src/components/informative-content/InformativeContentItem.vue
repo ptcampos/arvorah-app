@@ -1,13 +1,18 @@
 <template>
-  <q-item
+  <q-card
     @click="$emit('onClick', content)"
-    class="item shadow-1 q-mb-sm rounded-bg q-pt-md"
+    class="q-mb-md shadow-1"
     clickable
     v-ripple
     :disable="!content.released"
   >
-    <q-item-section>
-      <q-item-label>{{ content.title }} </q-item-label>
+    <img src="https://cdn.quasar.dev/img/mountains.jpg" />
+
+    <q-card-section>
+      <div class="text-h6">{{ content.title }}</div>
+      <div class="text-subtitle2">
+        {{ content.type && content.type === 'main' ? 'Principal' : 'Pílula' }}
+      </div>
       <q-item-label>
         <q-badge v-show="!content.released" color="orange">Em Breve</q-badge>
         <q-badge v-show="content.opened && content.rating === null" color="grey"
@@ -15,17 +20,13 @@
         >
         <q-badge v-show="content.opened && content.rating !== null" color="green">Avaliado</q-badge>
       </q-item-label>
-      <q-item-label caption>
-        Tipo: {{ content.type && content.type === 'main' ? 'Principal' : 'Pílula' }}
-      </q-item-label>
-      <!-- <q-item-label caption lines="2" :inner-html.prop="content.content | truncate(62, ' ')" /> -->
-    </q-item-section>
+    </q-card-section>
 
-    <q-item-section side top>
+    <q-card-section side top>
       <!-- <q-icon name="star" color="yellow" /> -->
       <q-item-label>{{ content.date | date('DD/MM/YYYY') }}</q-item-label>
-    </q-item-section>
-  </q-item>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script>

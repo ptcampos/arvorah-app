@@ -7,17 +7,14 @@
     transition-hide="flip-up"
   >
     <q-card class="text-primary">
-      <q-card-section>
-        <div class="text-h6">
-          Bem vindo ao Saúde Integrativa! Para começar, informe-nos as suas Principais Dores
-        </div>
-      </q-card-section>
-
-      <q-separator />
-
       <q-card-section v-show="step === 'painSelect'">
-        <div class="text-body text-bold">
-          Selecione as suas {{ requiredAmount }} Principais Dores para trabalharmos durante o Ciclo:
+        <div class="text-h6 text-center q-mb-sm">
+          Bem vindo ao Saúde Integrativa! Para começar, informe-nos os seus Principais Desafios
+        </div>
+        <q-separator />
+        <div class="text-body text-bold text-center q-mt-md">
+          Selecione os seus {{ requiredAmount }} Principais Desafios para trabalharmos durante o
+          Ciclo:
         </div>
         <div class="q-mt-sm row q-col-gutter-md">
           <div class="col-sm-3 col-xs-6" :key="option.value" v-for="option in options">
@@ -47,10 +44,20 @@
       </q-card-section>
 
       <q-card-section v-show="step === 'intensitySelect'">
-        <div class="text-body text-bold">
+        <div class="text-body text-bold text-center q-pt-lg">
           Quais as intensidades?
         </div>
-        <div class="q-mt-sm row q-col-gutter-md">
+        <IntensitySelectModal
+          :key="option.value"
+          v-for="option in selectedPains"
+          :show="option.showIntensitySelect"
+          :title="option.label"
+          :intensity="option.intensity"
+          @upIntensity="() => onUpIntensity(option)"
+          @downIntensity="() => onDownIntensity(option)"
+          @confirm="() => onConfirmIntensity(option)"
+        />
+        <!-- <div class="q-mt-sm row q-col-gutter-md">
           <div class="col-xs-12" :key="option.value" v-for="option in selectedPains">
             <div class="text-body text-dark">{{ option.label }}:</div>
             <div class="q-pl-md q-pr-md q-mt-lg">
@@ -66,6 +73,7 @@
             </div>
           </div>
         </div>
+        -->
         <div class="row q-mt-lg">
           <div class="col-xs-12">
             <q-btn
@@ -90,6 +98,7 @@
 
 <script>
 import { Platform } from 'quasar';
+import IntensitySelectModal from 'components/pain-intensity/IntensitySelectModal';
 
 export default {
   props: {
@@ -97,6 +106,10 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+
+  components: {
+    IntensitySelectModal,
   },
 
   data() {
@@ -110,6 +123,8 @@ export default {
           icon: '',
           selected: false,
           intensity: 1,
+          showIntensitySelect: false,
+          hidden: false,
         },
         {
           label: 'Efeitos Colaterais',
@@ -117,6 +132,8 @@ export default {
           icon: '',
           selected: false,
           intensity: 1,
+          showIntensitySelect: false,
+          hidden: false,
         },
         {
           label: 'Espiritualidade',
@@ -124,6 +141,8 @@ export default {
           icon: '',
           selected: false,
           intensity: 1,
+          showIntensitySelect: false,
+          hidden: false,
         },
         {
           label: 'Lidar com Emoções',
@@ -131,6 +150,8 @@ export default {
           icon: '',
           selected: false,
           intensity: 1,
+          showIntensitySelect: false,
+          hidden: false,
         },
         {
           label: 'Me Exercitar',
@@ -138,6 +159,8 @@ export default {
           icon: '',
           selected: false,
           intensity: 1,
+          showIntensitySelect: false,
+          hidden: false,
         },
         {
           label: 'Meus Direitos',
@@ -145,6 +168,8 @@ export default {
           icon: '',
           selected: false,
           intensity: 1,
+          showIntensitySelect: false,
+          hidden: false,
         },
         {
           label: 'Sexualidade',
@@ -152,6 +177,8 @@ export default {
           icon: '',
           selected: false,
           intensity: 1,
+          showIntensitySelect: false,
+          hidden: false,
         },
         {
           label: 'Vida após Câncer',
@@ -159,6 +186,8 @@ export default {
           icon: '',
           selected: false,
           intensity: 1,
+          showIntensitySelect: false,
+          hidden: false,
         },
       ],
     };
@@ -172,6 +201,10 @@ export default {
       option.selected = !option.selected;
     },
     goToIntensity() {
+      this.options = [...this.options].map(o => ({
+        ...o,
+        showIntensitySelect: o.selected,
+      }));
       this.step = 'intensitySelect';
     },
     async saveSelectedOptionsAndClose() {
@@ -186,7 +219,7 @@ export default {
         this.hideModal();
         this.$root.$emit('refreshCycleCronogram');
         this.$root.$emit('refreshClientCurrentCycle');
-        this.$root.$emit('showModal', 'cronogramaDoCiclo');
+        // this.$root.$emit('showModal', 'cronogramaDoCiclo');
       } catch (error) {
         let errorReason = '';
         if (
@@ -204,6 +237,24 @@ export default {
         });
       } finally {
         this.$q.loading.hide();
+      }
+    },
+    onUpIntensity(option) {
+      if (option.intensity < 10) {
+        option.intensity += 1;
+      }
+    },
+    onDownIntensity(option) {
+      if (option.intensity > 0) {
+        option.intensity -= 1;
+      }
+    },
+    onConfirmIntensity(option) {
+      option.showIntensitySelect = false;
+      option.hidden = true;
+      const countOpened = this.options.filter(o => o.showIntensitySelect).length;
+      if (countOpened === 0) {
+        this.saveSelectedOptionsAndClose();
       }
     },
   },
@@ -226,10 +277,10 @@ export default {
     },
     buttonLabel() {
       if (this.blockNextButton && this.pendingAmount < 0) {
-        return 'Selecione somente 3 dores';
+        return 'Selecione somente 3 desafios';
       }
       if (this.blockNextButton) {
-        return `Falta${this.pendingAmount > 1 ? 'm' : ''} ${this.pendingAmount} dor${
+        return `Falta${this.pendingAmount > 1 ? 'm' : ''} ${this.pendingAmount} desafio${
           this.pendingAmount > 1 ? 'es' : ''
         }`;
       }
