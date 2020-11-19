@@ -6,30 +6,46 @@
     v-ripple
     :disable="!content.released"
   >
-    <img src="https://cdn.quasar.dev/img/mountains.jpg" />
+    <div
+      class="l-pain-identifier"
+      :style="{
+        'background-color': getPainBackgroundColor(
+          content.InformativeModuleCyclePain.CyclePain.pain,
+        ),
+      }"
+    />
+    <img
+      :src="
+        cmsContent._embedded && cmsContent._embedded['wp:featuredmedia']
+          ? cmsContent._embedded['wp:featuredmedia']['0'].source_url
+          : 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif'
+      "
+    />
 
     <q-card-section>
-      <div class="text-h6">{{ content.title }}</div>
+      <div class="text-h6">{{ cmsContent.title.rendered }}</div>
       <div class="text-subtitle2">
-        {{ content.type && content.type === 'main' ? 'Principal' : 'Pílula' }}
+        <q-badge :color="content.released ? 'green' : 'orange'">{{
+          content.released ? 'Disponível' : 'Em breve'
+        }}</q-badge>
       </div>
-      <q-item-label>
-        <q-badge v-show="!content.released" color="orange">Em Breve</q-badge>
-        <q-badge v-show="content.opened && content.rating === null" color="grey"
-          >Visualizado - Falta Avaliar</q-badge
-        >
-        <q-badge v-show="content.opened && content.rating !== null" color="green">Avaliado</q-badge>
-      </q-item-label>
+      <div class="text-body" v-html="cmsContent.excerpt.rendered" />
     </q-card-section>
 
-    <q-card-section side top>
-      <!-- <q-icon name="star" color="yellow" /> -->
-      <q-item-label>{{ content.date | date('DD/MM/YYYY') }}</q-item-label>
+    <q-separator />
+
+    <q-card-section v-show="content.released">
+      <q-btn class="full-width" label="Leia Mais" no-caps flat color="primary" />
     </q-card-section>
+
+    <q-inner-loading :showing="loading">
+      <q-spinner color="primary" size="50px" />
+    </q-inner-loading>
   </q-card>
 </template>
 
 <script>
+import { painColor } from 'boot/utils';
 import { ionLocationOutline } from '@quasar/extras/ionicons-v5';
 
 export default {
@@ -43,9 +59,55 @@ export default {
   data() {
     return {
       ionLocationOutline,
+      loading: true,
+      cmsContent: {
+        title: {},
+        excerpt: {},
+      },
     };
+  },
+
+  async mounted() {
+    // get conteudo completo do cms...
+    this.loading = true;
+    try {
+      const conteudoCompleto = await this.$store.dispatch(
+        'informativeContent/getContentById',
+        this.content.informativeContentCMSId,
+      );
+      // console.log(conteudoCompleto);
+      this.cmsContent = conteudoCompleto;
+    } catch (error) {
+      console.log(error);
+      this.$q.notify({
+        message: '',
+        color: 'negative',
+      });
+    } finally {
+      this.loading = false;
+    }
+  },
+
+  methods: {
+    getPainBackgroundColor(pain) {
+      return painColor(pain);
+    },
   },
 };
 </script>
 
-<style></style>
+<style scoped>
+.l-pain-identifier {
+  width: 90%;
+  position: absolute;
+  top: -15px;
+  left: calc(50% - 45%);
+  height: 15px;
+  margin: 0 auto;
+  border-radius: 20px 20px 0 0;
+}
+
+.content-img {
+  /* height: 200px; */
+}
+</style>

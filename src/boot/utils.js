@@ -259,3 +259,26 @@ export const painIcon = pain => {
       return pain;
   }
 };
+
+export const painColor = pain => {
+  switch (pain) {
+    case 'comer_bem':
+      return '#12908E';
+    case 'efeitos_colaterais':
+      return '#F98F45';
+    case 'espiritualidade':
+      return '#0682A6';
+    case 'lidar_com_emocoes':
+      return '#C53A22';
+    case 'me_exercitar':
+      return '#00475C';
+    case 'meus_direitos':
+      return '#4E4848';
+    case 'sexualidade':
+      return '#FF8884';
+    case 'vida_apos_cancer':
+      return '#FFA13E';
+    default:
+      return '#000000';
+  }
+};

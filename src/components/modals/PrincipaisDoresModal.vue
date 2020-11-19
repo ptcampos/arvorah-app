@@ -23,7 +23,10 @@
                 :outline="!option.selected"
                 :label="option.label"
                 stack
-                color="indigo"
+                :style="{
+                  color: !option.selected ? getOptionColor(option) : 'white',
+                  background: getOptionColor(option),
+                }"
                 @click="toggle(option)"
                 style="height: 90px; width: 140px;"
               />
@@ -44,52 +47,39 @@
       </q-card-section>
 
       <q-card-section v-show="step === 'intensitySelect'">
-        <div class="text-body text-bold text-center q-pt-lg">
-          Quais as intensidades?
+        <div class="text-h6 text-center q-mb-sm">
+          Selecione as Intensidades das Dificuldades
         </div>
+        <q-separator />
         <IntensitySelectModal
           :key="option.value"
-          v-for="option in selectedPains"
+          v-for="(option, index) in optionsToSelectIntensity"
           :show="option.showIntensitySelect"
           :title="option.label"
           :intensity="option.intensity"
+          :order="index + 1"
+          :pain="option.value"
           @upIntensity="() => onUpIntensity(option)"
           @downIntensity="() => onDownIntensity(option)"
           @confirm="() => onConfirmIntensity(option)"
         />
-        <!-- <div class="q-mt-sm row q-col-gutter-md">
-          <div class="col-xs-12" :key="option.value" v-for="option in selectedPains">
-            <div class="text-body text-dark">{{ option.label }}:</div>
-            <div class="q-pl-md q-pr-md q-mt-lg">
-              <q-slider
-                v-model="option.intensity"
-                :min="1"
-                :max="10"
-                :step="1"
-                label
-                label-always
-                :color="option.intensity > 5 ? 'red' : 'green'"
-              />
-            </div>
-          </div>
-        </div>
-        -->
-        <div class="row q-mt-lg">
-          <div class="col-xs-12">
-            <q-btn
-              class="full-width"
-              label="Salvar"
-              color="primary"
-              @click="saveSelectedOptionsAndClose"
-            />
-            <q-btn
-              class="q-mt-sm full-width"
-              label="Voltar"
-              color="primary"
-              flat
-              @click="step = 'painSelect'"
-            />
-          </div>
+      </q-card-section>
+
+      <q-card-section
+        class="intensity-checked"
+        v-show="optionsWithSelectedIntensity && optionsWithSelectedIntensity.length"
+      >
+        <div
+          class="text-center text-h6 pain-with-checked-intensity"
+          :style="{
+            'background-color': getOptionColor(option),
+            color: 'white',
+          }"
+          :key="index"
+          v-for="(option, index) in optionsWithSelectedIntensity"
+          @click="returnHiddenToIntensitySelect(option)"
+        >
+          {{ option.label }}
         </div>
       </q-card-section>
     </q-card>
@@ -99,6 +89,8 @@
 <script>
 import { Platform } from 'quasar';
 import IntensitySelectModal from 'components/pain-intensity/IntensitySelectModal';
+
+import { painColor } from 'boot/utils';
 
 export default {
   props: {
@@ -181,7 +173,7 @@ export default {
           hidden: false,
         },
         {
-          label: 'Vida após Câncer',
+          label: 'Vida após o Câncer',
           value: 'vida_apos_cancer',
           icon: '',
           selected: false,
@@ -190,10 +182,23 @@ export default {
           hidden: false,
         },
       ],
+      optionsToSelectIntensity: [],
+      optionsWithSelectedIntensity: [],
     };
   },
 
   methods: {
+    returnHiddenToIntensitySelect(option) {
+      const optionObj = this.optionsToSelectIntensity.find(o => o.value === option.value);
+      if (optionObj) {
+        optionObj.showIntensitySelect = true;
+        optionObj.hidden = false;
+        this.optionsWithSelectedIntensity = this.optionsToSelectIntensity.filter(o => o.hidden);
+      }
+    },
+    getOptionColor(option) {
+      return painColor(option.value);
+    },
     hideModal() {
       this.$root.$emit('hideModal', 'principaisDores');
     },
@@ -205,6 +210,7 @@ export default {
         ...o,
         showIntensitySelect: o.selected,
       }));
+      this.optionsToSelectIntensity = this.options.filter(o => o.showIntensitySelect);
       this.step = 'intensitySelect';
     },
     async saveSelectedOptionsAndClose() {
@@ -252,10 +258,18 @@ export default {
     onConfirmIntensity(option) {
       option.showIntensitySelect = false;
       option.hidden = true;
-      const countOpened = this.options.filter(o => o.showIntensitySelect).length;
+      const countOpened = this.optionsToSelectIntensity.filter(o => o.showIntensitySelect).length;
       if (countOpened === 0) {
+        this.optionsToSelectIntensity.forEach(o => {
+          const optionOnMainList = this.options.find(oo => oo.value === o.value);
+          if (optionOnMainList) {
+            optionOnMainList.intensity = o.intensity;
+          }
+        });
         this.saveSelectedOptionsAndClose();
       }
+      this.optionsWithSelectedIntensity = this.optionsToSelectIntensity.filter(o => o.hidden);
+      console.log(this.optionsWithSelectedIntensity);
     },
   },
 
@@ -264,7 +278,7 @@ export default {
       return 3;
     },
     selectedPains() {
-      return [...this.options].filter(o => o.selected);
+      return [...this.options].filter(o => o.selected).sort((a, b) => (a.title > b.title ? 1 : -1));
     },
     amountOfSelectedOptions() {
       return this.options.filter(o => o.selected).length;
@@ -290,4 +304,20 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+div.intensity-checked {
+  width: 100%;
+  padding: 0;
+  z-index: 9999;
+  position: fixed;
+  bottom: 0;
+}
+
+div.pain-with-checked-intensity {
+  padding: 15px;
+  -webkit-box-shadow: 0px 1px 1px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow: 0px 1px 1px rgba(50, 50, 50, 0.75);
+  box-shadow: 0px 1px 1px rgba(50, 50, 50, 0.75);
+  color: white;
+}
+</style>

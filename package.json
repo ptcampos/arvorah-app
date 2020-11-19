@@ -8,7 +8,8 @@
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
-    "dev": "quasar dev"
+    "dev": "quasar dev",
+    "build": "quasar clean && quasar build"
   },
   "dependencies": {
     "@capacitor/core": "^2.4.2",

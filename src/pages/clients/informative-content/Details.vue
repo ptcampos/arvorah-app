@@ -1,46 +1,60 @@
 <template>
-  <q-page padding>
+  <q-page>
+    <div class="row">
+      <img
+        style="width: 100%;"
+        :src="
+          cmsContent._embedded && cmsContent._embedded['wp:featuredmedia']
+            ? cmsContent._embedded['wp:featuredmedia']['0'].source_url
+            : 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif'
+        "
+      />
+    </div>
+    <q-separator />
     <div class="row q-pa-sm q-col-gutter-sm">
       <div class="col-xs-12">
         <!-- <ProfessionalItem :professional="professional" /> -->
       </div>
       <div class="col-xs-12" id="informative-content">
-        <div class="text-body text-justify" v-html="informativeContent.content" />
+        <div class="text-body text-justify" v-html="cmsContent.content.rendered" />
         <!-- <q-date minimal flat class="full-width" v-model="date" :options="dateOptions" /> -->
         <q-separator class="q-mb-sm" />
       </div>
-      <div class="col-xs-12">
-        <label class="text-bold"
-          >Em uma escala de 0 a 10, o quanto você recomendaria esse conteúdo a um amigo ou colega?
-          <div class="q-mt-lg">
-            <q-slider
-              v-model="nps.intensity"
-              :min="0"
-              :max="10"
-              :step="1"
-              label
-              label-always
-              :color="nps.intensity <= 5 ? 'red' : 'green'"
-            />
-          </div>
-        </label>
-      </div>
-      <div class="col-xs-12 q-pb-lg q-pt-md">
-        <q-btn
-          @click="saveRating"
-          label="Salvar Avaliação"
-          no-caps
-          color="primary"
-          class="full-width"
-        />
-      </div>
     </div>
+
+    <q-dialog full-width v-model="ratingDialog" :position="'bottom'">
+      <q-card class="bg-grey-3">
+        <q-card-section class="row items-center">
+          <div>
+            <div class="text-weight-bold">Avalie o Conteúdo</div>
+            <div class="text-body">O que achou do conteúdo?</div>
+          </div>
+        </q-card-section>
+
+        <q-card-section class="row justify-center items-center">
+          <q-rating v-model="nps.intensity" size="3.5em" color="orange-5" />
+          <q-btn
+            class="q-mt-md full-width"
+            type="button"
+            @click="saveRating"
+            label="Avaliar Conteúdo"
+            no-caps
+            color="primary"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+    <q-scroll-observer @scroll="onScroll" />
   </q-page>
 </template>
 
 <script>
 // import ProfessionalItem from 'components/professionals/ProfessionalItem';
 import { openExternalURL } from 'boot/utils';
+import { dom } from 'quasar';
+
+// Offset on screen
+const { offset } = dom;
 
 export default {
   props: {
@@ -56,10 +70,19 @@ export default {
     return {
       professional: {},
       nps: {
-        intensity: 10,
+        intensity: 5,
+      },
+      cmsContent: {
+        title: {},
+        excerpt: {},
+        content: {},
       },
       date: '',
       dateOptions: ['2020/09/01', '2020/09/05', '2020/09/06', '2020/09/09', '2020/09/23'],
+      ratingDialog: false,
+      scrollInfo: {},
+      showedRating: false,
+      alreadyAnsweredRating: true,
     };
   },
 
@@ -69,17 +92,45 @@ export default {
         return this.$router.push('/app/client/informative-content');
       }
       this.$root.$emit('internalPage', true);
-      this.$root.$emit('changeTitle', this.informativeContent.title);
+
+      // carregar dados completos do conteudo
+      this.$q.loading.show();
+      try {
+        // console.log(this.informativeContent);
+        const conteudoCompleto = await this.$store.dispatch(
+          'informativeContent/getContentById',
+          this.informativeContent.informativeContentCMSId,
+        );
+        // console.log(conteudoCompleto);
+        // console.log(conteudoCompleto);
+        this.cmsContent = conteudoCompleto;
+        this.$root.$emit('changeTitle', this.cmsContent.title.rendered);
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Não foi possível carregar os detalhes do conteúdo',
+          color: 'negative',
+        });
+        return this.$router.push('/app/client/informative-content');
+      } finally {
+        this.$q.loading.hide();
+      }
 
       // save openedAt and opened
       if (!this.informativeContent.opened) {
-        this.$store.dispatch('cycle/saveInformativeContentOpenedDate', this.informativeContentId);
+        // this.$store.dispatch('cycle/saveInformativeContentOpenedDate', this.informativeContentId);
       }
-      this.nps.intensity = this.informativeContent.rating || 10;
+      if (this.informativeContent.rating) {
+        this.alreadyAnsweredRating = true;
+      } else {
+        this.alreadyAnsweredRating = false;
+      }
+      this.nps.intensity = this.informativeContent.rating || 5;
 
       const myElementToCheckIfClicksAreInsideOf = document.querySelector('#informative-content');
       document.body.addEventListener('click', event => {
         if (
+          myElementToCheckIfClicksAreInsideOf &&
           myElementToCheckIfClicksAreInsideOf.contains(event.target) &&
           event.target.tagName.toLowerCase() === 'a'
         ) {
@@ -93,6 +144,23 @@ export default {
   },
 
   methods: {
+    onScroll(info) {
+      const offsetContent = offset(document.getElementById('informative-content'));
+      if (offsetContent.top > 270 && this.showedRating) {
+        this.showedRating = false;
+      }
+      this.scrollInfo = info;
+      if (
+        info.direction === 'down' &&
+        offsetContent.top < 80 &&
+        !this.ratingDialog &&
+        !this.showedRating &&
+        !this.alreadyAnsweredRating
+      ) {
+        this.ratingDialog = true;
+        this.showedRating = true;
+      }
+    },
     async saveRating() {
       this.$q.loading.show();
       try {
@@ -104,6 +172,8 @@ export default {
           message: 'Obrigado! O seu feedback é muito importante para nós',
           color: 'positive',
         });
+        this.alreadyAnsweredRating = true;
+        this.ratingDialog = false;
       } catch (error) {
         console.log(error);
         this.$q.notify({
@@ -124,4 +194,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+iframe {
+  width: 100% !important;
+}
+</style>

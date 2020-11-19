@@ -12,10 +12,12 @@
 module.exports = function(ctx) {
   const devEnvs = {
     API_URL: 'http://192.168.1.183:3050/api/v1/',
+    WORDPRESS_CONTENT_API: 'http://saudeintegrativa.local'
     // API_URL: '"https://manuais-normativos-api.thriade.com/api/v1/"'
   };
   const prodEnvs = {
     API_URL: 'http://saude-integrativa-api.thriade.com/api/v1/',
+    WORDPRESS_CONTENT_API: 'http://saude-integrativa.thriade.com'
   };
 
   return {

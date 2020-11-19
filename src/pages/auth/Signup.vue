@@ -16,6 +16,41 @@
                 :rules="[val => !!val || 'Campo Obrigatório']"
                 hide-bottom-space
                 bg-color="grey-2"
+                type="text"
+                label="Nome"
+                outlined
+                v-model="user.name"
+              />
+            </div>
+            <div class="col-xs-12">
+              <q-input
+                :rules="[val => !!val || 'Campo Obrigatório']"
+                hide-bottom-space
+                bg-color="grey-2"
+                type="text"
+                label="Data de Nascimento"
+                outlined
+                v-model="user.birthDate"
+                mask="##/##/####"
+              />
+            </div>
+            <div class="col-xs-12">
+              <q-input
+                :rules="[val => !!val || 'Campo Obrigatório']"
+                hide-bottom-space
+                bg-color="grey-2"
+                type="text"
+                label="Celular"
+                outlined
+                v-model="user.phone"
+                mask="(##) #####-####"
+              />
+            </div>
+            <div class="col-xs-12">
+              <q-input
+                :rules="[val => !!val || 'Campo Obrigatório']"
+                hide-bottom-space
+                bg-color="grey-2"
                 type="email"
                 label="E-mail"
                 outlined
@@ -95,7 +130,10 @@ export default {
   data() {
     return {
       user: {
+        name: '',
         email: '',
+        birthDate: '',
+        phone: '',
         password: '',
         confirmPassword: '',
       },

@@ -8,8 +8,11 @@
     <InformativeContentItem
       :content="content"
       :key="content.id"
-      v-for="content in contents"
+      v-for="(content, index) in contents"
       @onClick="$emit('onClickItem', content)"
+      :style="{
+        'margin-top': index === 0 ? '15px' : '35px',
+      }"
     />
   </transition-group>
 </template>
