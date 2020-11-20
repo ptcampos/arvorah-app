@@ -4,7 +4,7 @@ import { Notify } from 'quasar';
 
 import routes from './routes';
 
-import { getUser, getUserPlan } from '../services/User';
+import { getUser, getUserPlan, removeUser } from '../services/User';
 
 Vue.use(VueRouter);
 
@@ -57,6 +57,7 @@ export default function(/* { store, ssrContext } */) {
     Notify.create({
       message: 'Você não tem permissão para acessar essa rota.',
     });
+    removeUser();
     return next('/app');
   });
 

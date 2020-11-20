@@ -44,6 +44,15 @@
 
           <q-separator />
 
+          <q-card-section v-if="professionalCycle">
+            <CycleProfessional
+              :professionalCycle="professionalCycle"
+              @onClick="openProfessionalChat"
+            />
+          </q-card-section>
+
+          <q-separator />
+
           <q-card-section v-show="currentCycle.startDate">
             <InformativeContentList @onClickItem="onClickContent" :contents="cycleCronogram" />
           </q-card-section>
@@ -57,28 +66,6 @@
               </div>
             </div>
           </q-card-section>
-
-          <!-- <q-card-section>
-            <div class="row q-col-gutter-md">
-              <div class="col-xs-12">
-                <q-btn
-                  icon="eva-clipboard-outline"
-                  color="primary"
-                  class="full-width"
-                  label="Conteúdo Informativo"
-                  @click="$router.push({ path: '/app/client/informative-content' })"
-                />
-                <q-btn
-                  icon="eva-calendar"
-                  flat
-                  color="primary"
-                  class="q-mt-sm full-width"
-                  label="Cronograma"
-                  @click="$root.$emit('showModal', 'cronogramaDoCiclo')"
-                />
-              </div>
-            </div>
-          </q-card-section> -->
         </q-card>
       </div>
 
@@ -105,6 +92,8 @@
 
 <script>
 import InformativeContentList from 'components/informative-content/InformativeContentList';
+import CycleProfessional from 'components/CycleProfessional';
+
 import {
   ionNewspaperOutline,
   ionCalendarOutline,
@@ -117,6 +106,7 @@ export default {
 
   components: {
     InformativeContentList,
+    CycleProfessional,
   },
 
   data() {
@@ -127,6 +117,7 @@ export default {
       ionNotificationsOutline,
       currentCycle: {},
       cycleCronogram: [],
+      professionalCycle: null,
     };
   },
 
@@ -146,6 +137,9 @@ export default {
   },
 
   methods: {
+    openProfessionalChat() {
+      console.log('openProfessionalChat');
+    },
     showPrincipaisDoresModal() {
       setTimeout(() => {
         this.$root.$emit('showModal', 'principaisDores');
@@ -197,6 +191,28 @@ export default {
         this.$q.loading.hide();
       }
     },
+    async getProfessionalCycle() {
+      this.$q.loading.show();
+      try {
+        const professionalCycle = await this.$store.dispatch(
+          'cycle/getProfessionalCycleWithStatus',
+          {
+            cycleId: this.currentCycle.id,
+            status: 'accepted',
+          },
+        );
+        console.log(professionalCycle);
+        this.professionalCycle = professionalCycle;
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao recuperar as informações do Profissional',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
     onClickContent(item) {
       if (!item.released) {
         return;
@@ -208,6 +224,7 @@ export default {
       await this.refreshCurrentCycle();
       if (this.currentCycle.startDate) {
         this.refreshCycleCronogram();
+        this.getProfessionalCycle();
       }
     },
   },

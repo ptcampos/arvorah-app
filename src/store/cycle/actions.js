@@ -35,3 +35,7 @@ export async function saveInformativeContentRating(_, payload) {
 export async function setCurrentInformativeContent({ commit }, informativeContent) {
   commit('setCurrentInformativeContent', informativeContent);
 }
+
+export function getProfessionalCycleWithStatus(_, payload) {
+  return cycleApi.getProfessionalCycleWithStatus(payload).then(r => r.result);
+}

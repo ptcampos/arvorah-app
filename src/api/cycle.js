@@ -27,6 +27,12 @@ class CycleApi extends CrudApi {
       .post(`cycles/save-informative-content-rating/${informativeContentId}`, payload)
       .then(r => r.data);
   }
+
+  getProfessionalCycleWithStatus(payload) {
+    return this.axiosInstance
+      .post('professional-cycle/professional-cycle-with-status', payload)
+      .then(r => r.data);
+  }
 }
 
 export default CycleApi;
