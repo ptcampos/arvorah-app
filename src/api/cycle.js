@@ -47,6 +47,10 @@ class CycleApi extends CrudApi {
   sendMessage(payload) {
     return this.axiosInstance.post('chat-messages', payload).then(r => r.data);
   }
+
+  sendTypingEvent(payload) {
+    return this.axiosInstance.post('chat-messages/send-typing-event', payload).then(r => r.data);
+  }
 }
 
 export default CycleApi;

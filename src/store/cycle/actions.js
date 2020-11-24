@@ -51,3 +51,7 @@ export async function getChatMessages(_, chatCode) {
 export async function sendMessage(_, payload) {
   return cycleApi.sendMessage(payload).then(r => r.result);
 }
+
+export async function sendTypingEvent(_, payload) {
+  return cycleApi.sendTypingEvent(payload).then(r => r.result);
+}

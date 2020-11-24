@@ -31,6 +31,9 @@
 
               <!-- <q-spinner-dots size="2rem" /> -->
             </q-chat-message>
+            <q-chat-message v-show="otherUserTyping">
+              <q-spinner-dots size="2rem" />
+            </q-chat-message>
             <div class="hidden-element" ref="scrollTarget"></div>
           </div>
         </q-scroll-area>
@@ -45,6 +48,7 @@
                 placeholder="Mensagem"
                 v-model="newMessage"
                 autogrow
+                @input="sendTypingEvent"
               >
                 <template v-slot:append>
                   <q-btn @click="sendMessage" round dense flat icon="send" />
@@ -75,6 +79,7 @@ export default {
       messages: [],
       newMessage: '',
       loading: true,
+      otherUserTyping: false,
     };
   },
 
@@ -84,6 +89,8 @@ export default {
     this.$root.$emit('internalPage', true);
     this.$root.$emit('changeTitle', 'Chat');
 
+    const currentUserId = getUser() && getUser().data ? getUser().data.id : null;
+
     const channel = this.$pusher.subscribe(this.chatCode);
     channel.bind('chat-event', data => {
       const dupMessage = this.messages.find(m => m.id === data.id);
@@ -92,11 +99,23 @@ export default {
       }
       this.scrollBottom();
     });
+    channel.bind('chat-typing', data => {
+      if (currentUserId) {
+        if (data && data.value > 0 && data.userId !== currentUserId) {
+          this.otherUserTyping = true;
+        } else {
+          this.otherUserTyping = false;
+        }
+      }
+    });
   },
 
   methods: {
     scrolled() {
       // console.log('oi');
+    },
+    sendTypingEvent(val) {
+      this.$store.dispatch('cycle/sendTypingEvent', { chatCode: this.chatCode, value: val.length });
     },
     scrollBottom() {
       const { scrollArea } = this.$refs;
@@ -130,6 +149,7 @@ export default {
       }
       this.$q.loading.show();
       try {
+        this.$store.dispatch('cycle/sendTypingEvent', { chatCode: this.chatCode, value: 0 });
         const message = await this.$store.dispatch('cycle/sendMessage', {
           chatCode: this.chatCode,
           message: this.newMessage,

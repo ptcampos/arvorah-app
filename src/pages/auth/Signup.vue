@@ -19,7 +19,18 @@
                 type="text"
                 label="Nome"
                 outlined
-                v-model="user.name"
+                v-model="user.firstName"
+              />
+            </div>
+            <div class="col-xs-12">
+              <q-input
+                :rules="[val => !!val || 'Campo Obrigatório']"
+                hide-bottom-space
+                bg-color="grey-2"
+                type="text"
+                label="Sobrenome"
+                outlined
+                v-model="user.lastName"
               />
             </div>
             <div class="col-xs-12">
@@ -130,7 +141,8 @@ export default {
   data() {
     return {
       user: {
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
         birthDate: '',
         phone: '',
