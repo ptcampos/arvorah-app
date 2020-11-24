@@ -33,6 +33,20 @@ class CycleApi extends CrudApi {
       .post('professional-cycle/professional-cycle-with-status', payload)
       .then(r => r.data);
   }
+
+  createAndOpenChatWithProfessionalInCycle(cycleId) {
+    return this.axiosInstance
+      .get(`professional-cycle/create-open-chat-with-professional-cycle/${cycleId}`)
+      .then(r => r.data);
+  }
+
+  getChatMessages(chatCode) {
+    return this.axiosInstance.get(`chat-messages/${chatCode}`).then(r => r.data);
+  }
+
+  sendMessage(payload) {
+    return this.axiosInstance.post('chat-messages', payload).then(r => r.data);
+  }
 }
 
 export default CycleApi;

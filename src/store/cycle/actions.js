@@ -39,3 +39,15 @@ export async function setCurrentInformativeContent({ commit }, informativeConten
 export function getProfessionalCycleWithStatus(_, payload) {
   return cycleApi.getProfessionalCycleWithStatus(payload).then(r => r.result);
 }
+
+export function createAndOpenChatWithProfessionalInCycle(_, cycleId) {
+  return cycleApi.createAndOpenChatWithProfessionalInCycle(cycleId).then(r => r.result);
+}
+
+export async function getChatMessages(_, chatCode) {
+  return cycleApi.getChatMessages(chatCode).then(r => r.result);
+}
+
+export async function sendMessage(_, payload) {
+  return cycleApi.sendMessage(payload).then(r => r.result);
+}

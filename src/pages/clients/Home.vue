@@ -137,8 +137,24 @@ export default {
   },
 
   methods: {
-    openProfessionalChat() {
-      console.log('openProfessionalChat');
+    async openProfessionalChat() {
+      this.$q.loading.show();
+      try {
+        // console.log(this.currentCycle);
+        const chat = await this.$store.dispatch(
+          'cycle/createAndOpenChatWithProfessionalInCycle',
+          this.currentCycle.id,
+        );
+        this.$router.push(`/app/client/current-cycle/chat/${chat.code}`);
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao recuperar as informações do Chat',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
     },
     showPrincipaisDoresModal() {
       setTimeout(() => {
@@ -201,7 +217,6 @@ export default {
             status: 'accepted',
           },
         );
-        console.log(professionalCycle);
         this.professionalCycle = professionalCycle;
       } catch (error) {
         console.log(error);

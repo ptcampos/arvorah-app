@@ -82,6 +82,12 @@ const routes = [
         component: () => import('pages/clients/schedule/SelectHour.vue'),
       },
       {
+        path: 'client/current-cycle/chat/:chatCode',
+        props: true,
+        meta: { requiresAuth: true, allowedUsers: ['user'] },
+        component: () => import('pages/chat/View.vue'),
+      },
+      {
         path: 'professional/home',
         meta: { requiresAuth: true, allowedUsers: ['professional'] },
         component: () => import('pages/Index.vue'),
