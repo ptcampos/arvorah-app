@@ -15,22 +15,37 @@
             >
               Esse chat ainda não possui nenhuma mensagem
             </q-banner>
-            <q-chat-message
-              :key="message.id"
-              v-for="message in messages"
-              :name="message.User.firstName"
-              :text="[message.message]"
-              :sent="currentUser && currentUser.id === message.User.id"
-            >
-              <template v-slot:avatar>
-                <img
-                  class="q-message-avatar q-message-avatar--received"
-                  src="https://cdn.quasar.dev/img/avatar2.jpg"
-                />
-              </template>
+            <div :key="message.id" v-for="message in messages">
+              <q-chat-message
+                v-show="message.senderType !== 'system'"
+                :name="message.User.firstName"
+                :text="[message.message]"
+                :sent="currentUser && currentUser.id === message.User.id"
+              >
+                <template v-slot:avatar>
+                  <img
+                    class="q-message-avatar q-message-avatar--received"
+                    src="https://cdn.quasar.dev/img/avatar2.jpg"
+                  />
+                </template>
+              </q-chat-message>
 
-              <!-- <q-spinner-dots size="2rem" /> -->
-            </q-chat-message>
+              <q-chat-message
+                v-if="
+                  message.senderType === 'system' && message.messageType === 'scheduleSuggestion'
+                "
+                :label="message.message"
+                class="system-message"
+                :class="{ 'system-message-interacted': message.eventInteracted }"
+                @click="clickOnSystemMessage(message)"
+              />
+
+              <q-chat-message
+                v-else-if="message.senderType === 'system'"
+                :label="message.message"
+                class="system-message-info"
+              />
+            </div>
             <q-chat-message v-show="otherUserTyping">
               <q-spinner-dots size="2rem" />
             </q-chat-message>
@@ -65,10 +80,50 @@
         </div>
       </div> -->
     </div>
+
+    <q-dialog @hide="suggestions = []" v-model="calendarSugestionModal">
+      <q-card style="min-width: 80%" class="q-pa-sm">
+        <q-toolbar>
+          <q-toolbar-title>
+            <span class="text-weight-bold">Melhor data</span>
+          </q-toolbar-title>
+
+          <q-btn flat round dense icon="close" v-close-popup />
+        </q-toolbar>
+
+        <q-separator />
+
+        <q-list bordered separator>
+          <q-item
+            @click="confirmSchedule(suggestion)"
+            v-ripple
+            clickable
+            :key="index"
+            v-for="(suggestion, index) in suggestions"
+          >
+            <q-item-section avatar>
+              <q-icon name="eva-calendar" />
+            </q-item-section>
+            <q-item-section
+              >{{ suggestion.date | date('DD/MM') }} às {{ suggestion.hour }}</q-item-section
+            >
+          </q-item>
+        </q-list>
+
+        <q-separator />
+
+        <q-card-actions>
+          <q-space />
+          <q-btn v-close-popup flat label="Cancelar" color="negative" no-caps />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script>
+import moment from 'moment';
+
 import { getUser } from '../../services/User';
 
 export default {
@@ -80,6 +135,8 @@ export default {
       newMessage: '',
       loading: true,
       otherUserTyping: false,
+      calendarSugestionModal: false,
+      suggestions: [],
     };
   },
 
@@ -114,6 +171,81 @@ export default {
     scrolled() {
       // console.log('oi');
     },
+    confirmSchedule(suggestion) {
+      const date = moment(suggestion.date).format('DD/MM/YYYY');
+      this.$q
+        .dialog({
+          message: `Você confirma o agendamento para a data ${date} às ${suggestion.hour} ?`,
+          title: 'Atenção',
+          ok: {
+            label: 'Sim, confirmo',
+            color: 'primary',
+            noCaps: true,
+            flat: true,
+          },
+          cancel: {
+            label: 'Não, cancelar',
+            color: 'negative',
+            noCaps: true,
+            flat: true,
+          },
+        })
+        .onOk(async () => {
+          this.$q.loading.show();
+          try {
+            // confirm schedule
+            await this.$store.dispatch('cycle/schedule', {
+              ...suggestion,
+            });
+            await this.sendSystemMessage({
+              message: `A consulta foi agendada com sucesso para o dia ${date} às ${suggestion.hour}.`,
+            });
+            // update scheduleSuggestion message to interacted
+            await this.$store.dispatch('cycle/updateMessageInteraction', {
+              interactedMessageId: suggestion.chatMessageId,
+              interacted: true,
+            });
+            const actionMessage = this.messages.find(m => m.id === suggestion.chatMessageId);
+            if (actionMessage) {
+              actionMessage.eventInteracted = true;
+            }
+            this.calendarSugestionModal = false;
+            this.$q.notify({
+              message: 'Evento confirmado com sucesso',
+              color: 'positive',
+            });
+          } catch (error) {
+            console.log(error);
+            this.$q.notify({
+              message: 'Erro ao agendar a consulta',
+              color: 'negative',
+            });
+          } finally {
+            this.$q.loading.hide();
+          }
+        });
+    },
+    async clickOnSystemMessage(message) {
+      if (message.messageType === 'scheduleSuggestion' && !message.eventInteracted) {
+        this.$q.loading.show();
+        try {
+          const suggestions = await this.$store.dispatch(
+            'cycle/getScheduleDateSuggestionsFromMessage',
+            message.id,
+          );
+          this.suggestions = suggestions;
+          this.calendarSugestionModal = true;
+        } catch (error) {
+          console.log(error);
+          this.$q.notify({
+            message: 'Erro ao recuperar as sugestões de data',
+            color: 'negative',
+          });
+        } finally {
+          this.$q.loading.hide();
+        }
+      }
+    },
     sendTypingEvent(val) {
       this.$store.dispatch('cycle/sendTypingEvent', { chatCode: this.chatCode, value: val.length });
     },
@@ -141,6 +273,26 @@ export default {
       } finally {
         this.$q.loading.hide();
         this.loading = false;
+      }
+    },
+    async sendSystemMessage(data) {
+      this.$q.loading.show();
+      try {
+        const message = await this.$store.dispatch('cycle/sendMessage', {
+          chatCode: this.chatCode,
+          message: data.message,
+          system: true,
+        });
+        this.messages.push(message);
+        this.scrollBottom();
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao salvar a mensagem',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
       }
     },
     async sendMessage() {

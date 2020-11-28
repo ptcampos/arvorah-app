@@ -51,6 +51,30 @@ class CycleApi extends CrudApi {
   sendTypingEvent(payload) {
     return this.axiosInstance.post('chat-messages/send-typing-event', payload).then(r => r.data);
   }
+
+  getScheduleDateSuggestionsFromMessage(messageId) {
+    return this.axiosInstance
+      .get('schedule-date-suggestions', { params: { messageId } })
+      .then(r => r.data);
+  }
+
+  schedule(payload) {
+    return this.axiosInstance.post('schedule/schedule', payload).then(r => r.data);
+  }
+
+  cancelSchedule(id) {
+    return this.axiosInstance.put(`schedule/cancel/${id}`).then(r => r.data);
+  }
+
+  listPendingSchedule() {
+    return this.axiosInstance.get('schedule/user-pending-schedules').then(r => r.data);
+  }
+
+  updateMessageInteraction(payload) {
+    return this.axiosInstance
+      .post('chat-messages/update-message-interaction', payload)
+      .then(r => r.data);
+  }
 }
 
 export default CycleApi;

@@ -55,3 +55,23 @@ export async function sendMessage(_, payload) {
 export async function sendTypingEvent(_, payload) {
   return cycleApi.sendTypingEvent(payload).then(r => r.result);
 }
+
+export async function getScheduleDateSuggestionsFromMessage(_, messageId) {
+  return cycleApi.getScheduleDateSuggestionsFromMessage(messageId).then(r => r.result);
+}
+
+export async function schedule(_, payload) {
+  return cycleApi.schedule(payload).then(r => r.result);
+}
+
+export async function cancelSchedule(_, id) {
+  return cycleApi.cancelSchedule(id).then(r => r.result);
+}
+
+export async function listPendingSchedule() {
+  return cycleApi.listPendingSchedule().then(r => r.result);
+}
+
+export async function updateMessageInteraction(_, payload) {
+  return cycleApi.updateMessageInteraction(payload).then(r => r.result);
+}

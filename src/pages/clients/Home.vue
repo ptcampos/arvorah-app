@@ -53,7 +53,16 @@
 
           <q-separator />
 
+          <div v-if="pendingSchedule">
+            <q-card-section>
+              <ScheduleCard :pendingSchedule="pendingSchedule" @onClick="openScheduleUpdate" />
+            </q-card-section>
+
+            <q-separator />
+          </div>
+
           <q-card-section v-show="currentCycle.startDate">
+            <div class="text-subtitle q-mb-lg">Conteúdo Informativo:</div>
             <InformativeContentList @onClickItem="onClickContent" :contents="cycleCronogram" />
           </q-card-section>
 
@@ -87,12 +96,49 @@
         </q-card>
       </div>
     </div>
+
+    <q-dialog v-model="scheduleActionsModal">
+      <q-card style="min-width: 80%;" class="q-pa-sm">
+        <q-toolbar>
+          <q-toolbar-title>
+            <span class="text-weight-bold">Ações</span>
+          </q-toolbar-title>
+
+          <q-btn flat round dense icon="close" v-close-popup />
+        </q-toolbar>
+
+        <div class="row q-col-gutter-sm">
+          <div class="col-xs-12">
+            <q-btn
+              class="full-width"
+              label="Cancelar"
+              color="negative"
+              no-caps
+              @click="confirmCancelSchedule"
+              v-close-popup
+            />
+          </div>
+          <div class="col-xs-12">
+            <q-btn
+              class="full-width"
+              label="Reagendar"
+              color="primary"
+              no-caps
+              @click="showRescheduleAlert"
+              v-close-popup
+            />
+          </div>
+        </div>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script>
+import _ from 'lodash';
 import InformativeContentList from 'components/informative-content/InformativeContentList';
 import CycleProfessional from 'components/CycleProfessional';
+import ScheduleCard from 'components/ScheduleCard';
 
 import {
   ionNewspaperOutline,
@@ -107,6 +153,7 @@ export default {
   components: {
     InformativeContentList,
     CycleProfessional,
+    ScheduleCard,
   },
 
   data() {
@@ -118,6 +165,8 @@ export default {
       currentCycle: {},
       cycleCronogram: [],
       professionalCycle: null,
+      pendingSchedule: null,
+      scheduleActionsModal: false,
     };
   },
 
@@ -137,6 +186,51 @@ export default {
   },
 
   methods: {
+    showRescheduleAlert() {
+      this.$q.dialog({
+        title: 'Atenção',
+        message: 'Para reagendar, solicite à sua Pessoa Navegadora pelo Chat',
+      });
+    },
+    confirmCancelSchedule() {
+      this.$q
+        .dialog({
+          title: 'Atenção',
+          message: 'Quer mesmo cancelar o agendamento da consulta?',
+          ok: {
+            label: 'Sim, cancelar',
+            flat: true,
+            noCaps: true,
+            color: 'primary',
+          },
+          cancel: {
+            label: 'Não',
+            flat: true,
+            noCaps: true,
+            color: 'negative',
+          },
+        })
+        .onOk(async () => {
+          // update event status to cancelled if date is not passed
+          this.$q.loading.show();
+          try {
+            await this.$store.dispatch('cycle/cancelSchedule', this.pendingSchedule.scheduleId);
+            this.init();
+            this.$q.notify({
+              message: 'O evento foi cancelado com sucesso',
+              color: 'positive',
+            });
+          } catch (error) {
+            console.log(error);
+            this.$q.notify({
+              message: 'Erro ao cancelar o agendamento, peça para um cancelamento manual',
+              color: 'negative',
+            });
+          } finally {
+            this.$q.loading.hide();
+          }
+        });
+    },
     async openProfessionalChat() {
       this.$q.loading.show();
       try {
@@ -155,6 +249,9 @@ export default {
       } finally {
         this.$q.loading.hide();
       }
+    },
+    openScheduleUpdate() {
+      this.scheduleActionsModal = true;
     },
     showPrincipaisDoresModal() {
       setTimeout(() => {
@@ -228,6 +325,21 @@ export default {
         this.$q.loading.hide();
       }
     },
+    async getPendingSchedules() {
+      this.$q.loading.show();
+      try {
+        const pendingSchedules = await this.$store.dispatch('cycle/listPendingSchedule');
+        this.pendingSchedule = _.head(pendingSchedules);
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao carregar os agendamentos pendentes',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
     onClickContent(item) {
       if (!item.released) {
         return;
@@ -240,6 +352,7 @@ export default {
       if (this.currentCycle.startDate) {
         this.refreshCycleCronogram();
         this.getProfessionalCycle();
+        this.getPendingSchedules();
       }
     },
   },

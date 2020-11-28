@@ -14,7 +14,7 @@
               : 'Pessoa Navegadora'
           }}
         </div>
-        <div class="text-body">{{ subtitle || 'Acesse para abrir o chat' }}</div>
+        <div class="text-body">{{ subtitle || 'Toque para abrir o Chat' }}</div>
       </div>
     </div>
     <div class="col-xs-2">
