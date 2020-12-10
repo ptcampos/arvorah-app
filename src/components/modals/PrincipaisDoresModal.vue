@@ -18,12 +18,11 @@
           class="q-mb-sm"
         />
         <div class="text-h6 text-center q-mb-sm">
-          Bem vindo ao Saúde Integrativa! Para começar, informe-nos os seus Principais Desafios
+          Criamos uma lista com alguns desafios que você pode estar enfrentando nesse momento.
         </div>
         <q-separator />
         <div class="text-body text-bold text-center q-mt-md">
-          Selecione os seus {{ requiredAmount }} Principais Desafios para trabalharmos durante o
-          Ciclo:
+          Selecione {{ requiredAmount }} opções para que possamos personalizar sua jornada:
         </div>
         <div class="q-mt-sm row q-col-gutter-md">
           <div class="col-sm-3 col-xs-6" :key="option.value" v-for="option in options">
@@ -257,6 +256,12 @@ export default {
         this.hideModal();
         this.$root.$emit('refreshCycleCronogram');
         this.$root.$emit('refreshClientCurrentCycle');
+        this.$q.dialog({
+          title: 'Obrigado pela confiança!',
+          message:
+            'Nas próximas 6 semanas abordaremos seus principais desafios através de conteúdos informativos curados pelo nosso time de especialistas! Dividiremos dicas e conhecimentos práticos personalizados que irão te ajudar a enfrentar suas dificuldades, trazendo maior qualidade de vida para o seu dia a dia',
+          persistent: true,
+        });
         // this.$root.$emit('showModal', 'cronogramaDoCiclo');
       } catch (error) {
         let errorReason = '';

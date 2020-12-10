@@ -51,16 +51,6 @@
             <div class="text-subtitle q-mb-lg">Conteúdo Informativo:</div>
             <InformativeContentList @onClickItem="onClickContent" :contents="cycleCronogram" />
           </q-card-section>
-
-          <q-card-section class="" v-show="!currentCycle.startDate">
-            <div class="row q-col-gutter-md">
-              <div class="col-xs-12">
-                <q-banner class="bg-info rounded-borders text-white">
-                  Preencha os Desafios para acessar o conteúdo informativo.
-                </q-banner>
-              </div>
-            </div>
-          </q-card-section>
         </q-card>
       </div>
 
@@ -69,10 +59,14 @@
           <q-card-section>
             <div class="row q-col-gutter-md">
               <div class="col-xs-12">
+                <div class="text-h6 q-mb-sm">
+                  Criamos uma lista com alguns desafios que você pode estar enfrentando nesse
+                  momento.
+                </div>
                 <q-btn
                   color="secondary"
                   class="q-mt-sm full-width q-py-sm"
-                  label="Preencher Desafios"
+                  label="Clique aqui para começar"
                   @click="$root.$emit('showModal', 'principaisDores')"
                   no-caps
                 />
@@ -153,6 +147,7 @@ export default {
       professionalCycle: null,
       pendingSchedule: null,
       scheduleActionsModal: false,
+      cycleEventsChannel: null,
     };
   },
 
@@ -172,6 +167,27 @@ export default {
   },
 
   methods: {
+    showDialogAndLinkToPNChat(professional) {
+      if (localStorage.getItem('pn-match')) {
+        return;
+      }
+      this.$q
+        .dialog({
+          title: 'Que legal!',
+          message: `Sabemos o quanto é importante podermos contar com uma rede de apoio e com calor humano durante os momentos desafiadores de nossa vida. Pensando nisso, gostaríamos de te apresentar a uma pessoa muito especial:  Sua navegadora ${professional.nickname}! Ela irá te ajudar a navegar durante todas as etapas de nossa jornada, e garantir que estejamos sempre alinhados com os seus objetivos e prioridades.`,
+          persistent: true,
+          ok: {
+            flat: true,
+            noCaps: true,
+            color: 'primary',
+            label: 'Clique aqui para saber mais',
+          },
+        })
+        .onOk(() => {
+          this.openProfessionalChat();
+          localStorage.setItem('pn-match', 1);
+        });
+    },
     showRescheduleAlert() {
       this.$q.dialog({
         title: 'Atenção',
@@ -250,6 +266,35 @@ export default {
         const currentUserCycle = await this.$store.dispatch('cycle/getUserCycle');
         if (!currentUserCycle || !currentUserCycle.active) {
           // this.showPrincipaisDoresModal();
+          await this.$q
+            .dialog({
+              title: `Seja bem vindo(a) XXX`,
+              message:
+                'Parabéns por ter aceitado o desafio de assumir o controle de sua própria jornada!. Estamos muito felizes em poder fazer parte de sua história, e seremos sempre gratos pela sua confiança!',
+              persistent: true,
+              ok: {
+                label: 'Continuar',
+                noCaps: true,
+                flat: true,
+              },
+            })
+            .onOk(async () => {
+              await this.$q
+                .dialog({
+                  title: 'Queremos te conhecer melhor',
+                  message:
+                    'Primeiro vamos falar dos seus Principais Desafios, identificá-los nos ajuda a definir prioridades e a fazer escolhas. Dessa forma, estaremos mais próximos de atingir nossos objetivos!',
+                  persistent: true,
+                  ok: {
+                    label: 'Continuar',
+                    noCaps: true,
+                    flat: true,
+                  },
+                })
+                .onOk(() => {
+                  this.$root.$emit('showModal', 'principaisDores');
+                });
+            });
         } else {
           this.currentCycle = currentUserCycle;
         }
@@ -301,6 +346,15 @@ export default {
           },
         );
         this.professionalCycle = professionalCycle;
+        if (professionalCycle) {
+          this.showDialogAndLinkToPNChat(professionalCycle);
+        } else if (!this.cycleEventsChannel) {
+          // register pusher event
+          this.cycleEventsChannel = this.$pusher.subscribe(`cycle-events-${this.currentCycle.id}`);
+          this.cycleEventsChannel.bind('cycle-pn-match', data => {
+            this.showDialogAndLinkToPNChat(data);
+          });
+        }
       } catch (error) {
         console.log(error);
         this.$q.notify({
