@@ -8,6 +8,15 @@
   >
     <q-card class="text-primary">
       <q-card-section v-show="step === 'painSelect'">
+        <q-btn
+          icon="eva-arrow-ios-back-outline"
+          size="16px"
+          @click="$root.$emit('hideModal', 'principaisDores')"
+          label="Voltar"
+          :ripple="false"
+          flat
+          class="q-mb-sm"
+        />
         <div class="text-h6 text-center q-mb-sm">
           Bem vindo ao Saúde Integrativa! Para começar, informe-nos os seus Principais Desafios
         </div>
@@ -47,6 +56,17 @@
       </q-card-section>
 
       <q-card-section v-show="step === 'intensitySelect'">
+        <q-btn
+          icon="eva-arrow-ios-back-outline"
+          size="13px"
+          @click="
+            step = 'painSelect';
+            optionsWithSelectedIntensity = [];
+          "
+          label="Voltar"
+          :ripple="false"
+          flat
+        />
         <div class="text-h6 text-center q-mb-sm">
           Selecione as Intensidades das Dificuldades
         </div>
@@ -62,6 +82,7 @@
           @upIntensity="() => onUpIntensity(option)"
           @downIntensity="() => onDownIntensity(option)"
           @confirm="() => onConfirmIntensity(option)"
+          @manualChangeIntensity="val => manualSetIntensity(option, val)"
         />
       </q-card-section>
 
@@ -70,16 +91,18 @@
         v-show="optionsWithSelectedIntensity && optionsWithSelectedIntensity.length"
       >
         <div
-          class="text-center text-h6 pain-with-checked-intensity"
+          class="text-center pain-with-checked-intensity"
           :style="{
             'background-color': getOptionColor(option),
             color: 'white',
+            fontSize: '15px',
           }"
           :key="index"
           v-for="(option, index) in optionsWithSelectedIntensity"
           @click="returnHiddenToIntensitySelect(option)"
         >
           {{ option.label }}
+          <q-icon color="white" name="eva-arrow-ios-upward-outline" />
         </div>
       </q-card-section>
     </q-card>
@@ -114,7 +137,7 @@ export default {
           value: 'comer_bem',
           icon: '',
           selected: false,
-          intensity: 1,
+          intensity: 0,
           showIntensitySelect: false,
           hidden: false,
         },
@@ -123,7 +146,7 @@ export default {
           value: 'efeitos_colaterais',
           icon: '',
           selected: false,
-          intensity: 1,
+          intensity: 0,
           showIntensitySelect: false,
           hidden: false,
         },
@@ -132,7 +155,7 @@ export default {
           value: 'espiritualidade',
           icon: '',
           selected: false,
-          intensity: 1,
+          intensity: 0,
           showIntensitySelect: false,
           hidden: false,
         },
@@ -141,7 +164,7 @@ export default {
           value: 'lidar_com_emocoes',
           icon: '',
           selected: false,
-          intensity: 1,
+          intensity: 0,
           showIntensitySelect: false,
           hidden: false,
         },
@@ -150,7 +173,7 @@ export default {
           value: 'me_exercitar',
           icon: '',
           selected: false,
-          intensity: 1,
+          intensity: 0,
           showIntensitySelect: false,
           hidden: false,
         },
@@ -159,7 +182,7 @@ export default {
           value: 'meus_direitos',
           icon: '',
           selected: false,
-          intensity: 1,
+          intensity: 0,
           showIntensitySelect: false,
           hidden: false,
         },
@@ -168,7 +191,7 @@ export default {
           value: 'sexualidade',
           icon: '',
           selected: false,
-          intensity: 1,
+          intensity: 0,
           showIntensitySelect: false,
           hidden: false,
         },
@@ -177,7 +200,7 @@ export default {
           value: 'vida_apos_cancer',
           icon: '',
           selected: false,
-          intensity: 1,
+          intensity: 0,
           showIntensitySelect: false,
           hidden: false,
         },
@@ -204,6 +227,15 @@ export default {
     },
     toggle(option) {
       option.selected = !option.selected;
+      // se estiver selecionado, verifica quantidade selecionado e caso seja mais de 3 apresenta modal informativa
+      if (option.selected && this.moreThanAcceptedQuantity) {
+        this.$q.dialog({
+          title: 'Atenção',
+          message:
+            'Selecione apenas 3 desafios, caso queira trocar desmarque uma opcao selecionada',
+        });
+        option.selected = false;
+      }
     },
     goToIntensity() {
       this.options = [...this.options].map(o => ({
@@ -255,6 +287,9 @@ export default {
         option.intensity -= 1;
       }
     },
+    manualSetIntensity(option, val) {
+      option.intensity = val;
+    },
     onConfirmIntensity(option) {
       option.showIntensitySelect = false;
       option.hidden = true;
@@ -269,7 +304,7 @@ export default {
         this.saveSelectedOptionsAndClose();
       }
       this.optionsWithSelectedIntensity = this.optionsToSelectIntensity.filter(o => o.hidden);
-      console.log(this.optionsWithSelectedIntensity);
+      // console.log(this.optionsWithSelectedIntensity);
     },
   },
 
@@ -288,6 +323,9 @@ export default {
     },
     pendingAmount() {
       return this.requiredAmount - this.amountOfSelectedOptions;
+    },
+    moreThanAcceptedQuantity() {
+      return this.blockNextButton && this.amountOfSelectedOptions > this.requiredAmount;
     },
     buttonLabel() {
       if (this.blockNextButton && this.pendingAmount < 0) {

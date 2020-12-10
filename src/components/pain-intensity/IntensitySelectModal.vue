@@ -1,17 +1,14 @@
 <template>
-  <div class="wrapper" v-if="show">
+  <div class="relative-position" v-if="show">
     <q-card
-      class="text-primary intensity-select-card"
-      style="width: 700px; max-width: 80vw;"
+      class="wrapper text-primary intensity-select-card"
+      style="width: 700px; max-width: 90vw;"
       :style="{
-        top: `${order * 45.5}px`,
+        top: getTopDistance(),
       }"
     >
       <q-card-section>
         <div class="text-h5 text-center">{{ title }}</div>
-        <div class="text-bold">
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptate rem modi unde.
-        </div>
         <q-btn
           outline
           no-caps
@@ -24,6 +21,16 @@
       </q-card-section>
 
       <q-card-section class="q-pb-lg">
+        <q-slider
+          :value="intensity"
+          :min="0"
+          :max="10"
+          :step="1"
+          label
+          label-always
+          color="primary"
+          @change="val => $emit('manualChangeIntensity', val)"
+        />
         <div class="row items-center q-col-gutter-md text-center">
           <div class="col">
             <q-btn icon="eva-minus-outline" @click="$emit('downIntensity')" round />
@@ -107,6 +114,18 @@ export default {
   },
 
   methods: {
+    getTopDistance() {
+      if (this.order === 1) {
+        return '10px';
+      }
+      if (this.order === 2) {
+        return '60px';
+      }
+      if (this.order === 3) {
+        return '115px';
+      }
+      return '150px';
+    },
     onCloseMoreDetails() {
       this.showMoreDetailsAboutPain = false;
       this.moreDetails.title = '';
@@ -156,6 +175,6 @@ export default {
 
 .wrapper {
   position: absolute;
-  left: 50%;
+  left: 0;
 }
 </style>
