@@ -3,20 +3,6 @@
     <div class="row">
       <div class="col-xs-12">
         <q-card flat bordered class="my-card bg-grey-2">
-          <q-card-section class="">
-            <div class="row q-col-gutter-md">
-              <div class="col-xs-12">
-                <q-list>
-                  <q-item tag="label">
-                    <q-item-section>
-                      <q-item-label>Seu Plano:</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </div>
-            </div>
-          </q-card-section>
-
           <q-card-section class="" v-show="currentCycle.startDate">
             <div class="row q-col-gutter-md">
               <div class="col-xs-12">
