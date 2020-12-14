@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-xs-12">
         <q-card flat bordered class="my-card bg-grey-2">
-          <q-card-section class="" v-show="currentCycle.startDate">
+          <!-- <q-card-section class="" v-show="currentCycle.startDate">
             <div class="row q-col-gutter-md">
               <div class="col-xs-12">
                 <q-list>
@@ -28,7 +28,7 @@
             </div>
           </q-card-section>
 
-          <q-separator />
+          <q-separator /> -->
 
           <q-card-section v-if="professionalCycle">
             <CycleProfessional
@@ -48,7 +48,7 @@
           </div>
 
           <q-card-section v-show="currentCycle.startDate">
-            <div class="text-subtitle q-mb-lg">Conteúdo Informativo:</div>
+            <div class="text-subtitle q-mb-lg">Último artigo recomendado:</div>
             <InformativeContentList @onClickItem="onClickContent" :contents="cycleCronogram" />
           </q-card-section>
         </q-card>
@@ -62,6 +62,11 @@
                 <div class="text-h6 q-mb-sm">
                   Criamos uma lista com alguns desafios que você pode estar enfrentando nesse
                   momento.
+                </div>
+                <div class="text-body">
+                  Primeiro vamos falar dos seus Principais Desafios, identificá-los nos ajuda a
+                  definir prioridades e a fazer escolhas. Dessa forma, estaremos mais próximos de
+                  atingir nossos objetivos!
                 </div>
                 <q-btn
                   color="secondary"
@@ -119,13 +124,14 @@ import _ from 'lodash';
 import InformativeContentList from 'components/informative-content/InformativeContentList';
 import CycleProfessional from 'components/CycleProfessional';
 import ScheduleCard from 'components/ScheduleCard';
-
 import {
   ionNewspaperOutline,
   ionCalendarOutline,
   ionBookmarksOutline,
   ionNotificationsOutline,
 } from '@quasar/extras/ionicons-v5';
+
+import * as UserService from '../../services/User';
 
 export default {
   name: 'PageClientHome',
@@ -266,9 +272,11 @@ export default {
         const currentUserCycle = await this.$store.dispatch('cycle/getUserCycle');
         if (!currentUserCycle || !currentUserCycle.active) {
           // this.showPrincipaisDoresModal();
+          // console.log(UserService.getUser());
+          const name = UserService.getUser().data.firstName;
           await this.$q
             .dialog({
-              title: `Seja bem vindo(a) XXX`,
+              title: `Seja bem vindo(a) ${name}`,
               message:
                 'Parabéns por ter aceitado o desafio de assumir o controle de sua própria jornada!. Estamos muito felizes em poder fazer parte de sua história, e seremos sempre gratos pela sua confiança!',
               persistent: true,
@@ -347,7 +355,7 @@ export default {
         );
         this.professionalCycle = professionalCycle;
         if (professionalCycle) {
-          this.showDialogAndLinkToPNChat(professionalCycle);
+          this.showDialogAndLinkToPNChat(professionalCycle.Professional);
         } else if (!this.cycleEventsChannel) {
           // register pusher event
           this.cycleEventsChannel = this.$pusher.subscribe(`cycle-events-${this.currentCycle.id}`);
