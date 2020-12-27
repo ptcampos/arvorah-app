@@ -82,7 +82,7 @@
     </div>
 
     <q-dialog @hide="suggestions = []" v-model="calendarSugestionModal">
-      <q-card style="min-width: 80%" class="q-pa-sm">
+      <q-card style="min-width: 95%" class="q-pa-sm">
         <q-toolbar>
           <q-toolbar-title>
             <span class="text-weight-bold">Melhor data</span>
@@ -105,15 +105,23 @@
               <q-icon name="eva-calendar" />
             </q-item-section>
             <q-item-section
-              >{{ suggestion.date | date('DD/MM') }} às {{ suggestion.hour }}</q-item-section
+              >{{ suggestion.date | date('DD/MM') }} às {{ suggestion.hour }} -
+              {{ suggestion.date | date('dddd') }}</q-item-section
             >
           </q-item>
         </q-list>
 
         <q-separator />
 
-        <q-card-actions>
-          <q-space />
+        <q-card-actions vertical>
+          <q-btn
+            v-close-popup
+            flat
+            label="Não encontrei um horário disponível"
+            color="warning"
+            @click="sendHourNotFoundMessage"
+            no-caps
+          />
           <q-btn v-close-popup flat label="Cancelar" color="negative" no-caps />
         </q-card-actions>
       </q-card>
@@ -137,6 +145,7 @@ export default {
       otherUserTyping: false,
       calendarSugestionModal: false,
       suggestions: [],
+      chatEvents: null,
     };
   },
 
@@ -148,15 +157,16 @@ export default {
 
     const currentUserId = getUser() && getUser().data ? getUser().data.id : null;
 
-    const channel = this.$pusher.subscribe(this.chatCode);
-    channel.bind('chat-event', data => {
+    this.chatEvents = this.$pusher.subscribe(this.chatCode);
+    this.chatEvents.bind('chat-event', data => {
       const dupMessage = this.messages.find(m => m.id === data.id);
       if (!dupMessage) {
         this.messages.push(data);
+        this.updateUnreadMessages([data.id]);
       }
       this.scrollBottom();
     });
-    channel.bind('chat-typing', data => {
+    this.chatEvents.bind('chat-typing', data => {
       if (currentUserId) {
         if (data && data.value > 0 && data.userId !== currentUserId) {
           this.otherUserTyping = true;
@@ -165,6 +175,11 @@ export default {
         }
       }
     });
+  },
+
+  destroyed() {
+    // console.log('unsubscribe');
+    this.$pusher.unsubscribe(this.chatCode);
   },
 
   methods: {
@@ -259,11 +274,30 @@ export default {
       }, 1);
     },
     populateMessages() {},
+    async updateUnreadMessages(unreadMessagesIds) {
+      this.$q.loading.show();
+      try {
+        if (unreadMessagesIds && unreadMessagesIds.length) {
+          await this.$store.dispatch('cycle/updateUnreadMessages', { unreadMessagesIds });
+        }
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao atualizar as mensagens não lidas',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
     async init() {
       this.$q.loading.show();
       try {
         this.messages = await this.$store.dispatch('cycle/getChatMessages', this.chatCode);
+        // batch update new messages case unread
+        const unreadMessagesIds = this.messages.filter(m => !m.readMessageAt).map(m => m.id);
         this.scrollBottom();
+        this.updateUnreadMessages(unreadMessagesIds);
       } catch (error) {
         console.log(error);
         this.$q.notify({
@@ -289,6 +323,28 @@ export default {
         console.log(error);
         this.$q.notify({
           message: 'Erro ao salvar a mensagem',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
+    async sendHourNotFoundMessage() {
+      this.$q.loading.show();
+      try {
+        const message = await this.$store.dispatch('cycle/sendMessage', {
+          chatCode: this.chatCode,
+          message: 'Não encontrei um horário disponível',
+          autoMessage: true,
+          messageType: 'no-schedule-found',
+        });
+        this.messages.push(message);
+        this.newMessage = '';
+        this.scrollBottom();
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao enviar a mensagem',
           color: 'negative',
         });
       } finally {

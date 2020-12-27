@@ -1,36 +1,46 @@
 <template>
   <q-page>
     <div class="row">
+      <div class="col-xs-12 ">
+        <div class="row q-pa-md justify-end">
+          <q-btn
+            @click="openPendingPRO"
+            :disable="!pendingPRO"
+            class="q-ml-sm"
+            round
+            :color="pendingPRO ? 'pink' : 'grey'"
+            label="PRO"
+          >
+          </q-btn>
+          <q-btn
+            @click="openScheduleUpdate"
+            :disable="!pendingSchedule"
+            class="q-ml-sm"
+            round
+            :color="pendingSchedule ? 'blue' : 'grey'"
+            icon="eva-calendar-outline"
+          >
+          </q-btn>
+          <q-btn @click="openProfessionalChat" :disable="!professionalCycle" class="q-ml-sm" round>
+            <q-avatar size="42px">
+              <img src="https://cdn.quasar.dev/img/avatar2.jpg" />
+            </q-avatar>
+            <q-badge v-show="pendingMessages && pendingMessages.length" color="red" floating>
+              {{ pendingMessages.length }}
+            </q-badge>
+            <q-icon
+              name="eva-message-square"
+              class="absolute"
+              color="light-green-13"
+              style="bottom: -5px; right: -5px;"
+            />
+          </q-btn>
+        </div>
+      </div>
+
       <div class="col-xs-12">
         <q-card flat bordered class="my-card bg-grey-2">
-          <!-- <q-card-section class="" v-show="currentCycle.startDate">
-            <div class="row q-col-gutter-md">
-              <div class="col-xs-12">
-                <q-list>
-                  <q-item tag="label">
-                    <q-item-section>
-                      <q-item-label>Início:</q-item-label>
-                    </q-item-section>
-                    <q-item-section side>
-                      {{ currentCycle.startDate | date('DD/MM/YYYY') }}
-                    </q-item-section>
-                  </q-item>
-                  <q-item tag="label">
-                    <q-item-section>
-                      <q-item-label>Fim:</q-item-label>
-                    </q-item-section>
-                    <q-item-section side>
-                      {{ currentCycle.endDate | date('DD/MM/YYYY') }}
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </div>
-            </div>
-          </q-card-section>
-
-          <q-separator /> -->
-
-          <q-card-section v-if="professionalCycle">
+          <!-- <q-card-section v-if="professionalCycle">
             <CycleProfessional
               :professionalCycle="professionalCycle"
               @onClick="openProfessionalChat"
@@ -45,10 +55,10 @@
             </q-card-section>
 
             <q-separator />
-          </div>
+          </div> -->
 
           <q-card-section v-show="currentCycle.startDate">
-            <div class="text-subtitle q-mb-lg">Último artigo recomendado:</div>
+            <div class="text-subtitle q-mb-lg">Últimos artigo recomendado:</div>
             <InformativeContentList @onClickItem="onClickContent" :contents="cycleCronogram" />
           </q-card-section>
         </q-card>
@@ -59,11 +69,11 @@
           <q-card-section>
             <div class="row q-col-gutter-md">
               <div class="col-xs-12">
-                <div class="text-h6 q-mb-sm">
+                <div class="text-h6 q-mb-sm q-pl-sm q-pr-sm">
                   Criamos uma lista com alguns desafios que você pode estar enfrentando nesse
                   momento.
                 </div>
-                <div class="text-body">
+                <div class="text-body q-pl-sm q-pr-sm">
                   Primeiro vamos falar dos seus Principais Desafios, identificá-los nos ajuda a
                   definir prioridades e a fazer escolhas. Dessa forma, estaremos mais próximos de
                   atingir nossos objetivos!
@@ -122,8 +132,8 @@
 <script>
 import _ from 'lodash';
 import InformativeContentList from 'components/informative-content/InformativeContentList';
-import CycleProfessional from 'components/CycleProfessional';
-import ScheduleCard from 'components/ScheduleCard';
+// import CycleProfessional from 'components/CycleProfessional';
+// import ScheduleCard from 'components/ScheduleCard';
 import {
   ionNewspaperOutline,
   ionCalendarOutline,
@@ -138,8 +148,6 @@ export default {
 
   components: {
     InformativeContentList,
-    CycleProfessional,
-    ScheduleCard,
   },
 
   data() {
@@ -152,8 +160,10 @@ export default {
       cycleCronogram: [],
       professionalCycle: null,
       pendingSchedule: null,
+      pendingPRO: null,
       scheduleActionsModal: false,
       cycleEventsChannel: null,
+      pendingMessages: [],
     };
   },
 
@@ -261,6 +271,7 @@ export default {
     openScheduleUpdate() {
       this.scheduleActionsModal = true;
     },
+    openPendingPRO() {},
     showPrincipaisDoresModal() {
       setTimeout(() => {
         this.$root.$emit('showModal', 'principaisDores');
@@ -355,7 +366,30 @@ export default {
         );
         this.professionalCycle = professionalCycle;
         if (professionalCycle) {
+          // console.log(professionalCycle);
           this.showDialogAndLinkToPNChat(professionalCycle.Professional);
+
+          // GET CHAT
+          const chat = await this.$store.dispatch(
+            'cycle/createAndOpenChatWithProfessionalInCycle',
+            this.currentCycle.id,
+          );
+          // get unread messages from chat
+          this.pendingMessages = await this.$store.dispatch(
+            'cycle/getUnreadMessagesFromChat',
+            chat.id,
+          );
+          const channel = this.$pusher.subscribe(chat.code);
+          channel.bind('chat-event', data => {
+            const currentUserId =
+              UserService.getUser() && UserService.getUser().data
+                ? UserService.getUser().data.id
+                : null;
+            const newMessageUserId = data.userId;
+            if (currentUserId !== newMessageUserId) {
+              this.pendingMessages.push(data);
+            }
+          });
         } else if (!this.cycleEventsChannel) {
           // register pusher event
           this.cycleEventsChannel = this.$pusher.subscribe(`cycle-events-${this.currentCycle.id}`);
@@ -397,6 +431,7 @@ export default {
     },
     async init() {
       await this.refreshCurrentCycle();
+      this.pendingMessages = [];
       if (this.currentCycle.startDate) {
         this.refreshCycleCronogram();
         this.getProfessionalCycle();

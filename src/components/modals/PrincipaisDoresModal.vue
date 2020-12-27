@@ -15,12 +15,7 @@
           label="Voltar"
           :ripple="false"
           flat
-          class="q-mb-sm"
         />
-        <div class="text-h6 text-center q-mb-sm">
-          Criamos uma lista com alguns desafios que você pode estar enfrentando nesse momento.
-        </div>
-        <q-separator />
         <div class="text-body text-bold text-center q-mt-md">
           Selecione {{ requiredAmount }} opções para que possamos personalizar sua jornada:
         </div>
@@ -66,10 +61,9 @@
           :ripple="false"
           flat
         />
-        <div class="text-h6 text-center q-mb-sm">
-          Selecione as Intensidades das Dificuldades
+        <div class="text-body text-bold text-center q-mt-md q-mb-sm">
+          O quanto esse desafio interfere no seu dia a dia?
         </div>
-        <q-separator />
         <IntensitySelectModal
           :key="option.value"
           v-for="(option, index) in optionsToSelectIntensity"

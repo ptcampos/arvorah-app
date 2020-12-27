@@ -75,6 +75,16 @@ class CycleApi extends CrudApi {
       .post('chat-messages/update-message-interaction', payload)
       .then(r => r.data);
   }
+
+  getUnreadMessagesFromChat(chatId) {
+    return this.axiosInstance.get(`chat-messages/unread-messages/${chatId}`).then(r => r.data);
+  }
+
+  updateUnreadMessages(payload) {
+    return this.axiosInstance
+      .post('chat-messages/update-unread-messages', payload)
+      .then(r => r.data);
+  }
 }
 
 export default CycleApi;

@@ -21,16 +21,36 @@
       </q-card-section>
 
       <q-card-section class="q-pb-lg">
-        <q-slider
-          :value="intensity"
-          :min="0"
-          :max="10"
-          :step="1"
-          label
-          label-always
-          color="primary"
-          @change="val => $emit('manualChangeIntensity', val)"
-        />
+        <div class="row">
+          <q-slider
+            :value="intensity"
+            :min="0"
+            :max="10"
+            :step="1"
+            label
+            label-always
+            color="primary"
+            @change="val => $emit('manualChangeIntensity', val)"
+          />
+          <div
+            class="absolute"
+            :style="{
+              left: '10px',
+              top: '50px',
+            }"
+          >
+            Pouco
+          </div>
+          <div
+            class="absolute"
+            :style="{
+              right: '10px',
+              top: '50px',
+            }"
+          >
+            Muito
+          </div>
+        </div>
         <div class="row items-center q-col-gutter-md text-center">
           <div class="col">
             <q-btn icon="eva-minus-outline" @click="$emit('downIntensity')" round />

@@ -75,3 +75,11 @@ export async function listPendingSchedule() {
 export async function updateMessageInteraction(_, payload) {
   return cycleApi.updateMessageInteraction(payload).then(r => r.result);
 }
+
+export async function getUnreadMessagesFromChat(_, chatId) {
+  return cycleApi.getUnreadMessagesFromChat(chatId).then(r => r.result);
+}
+
+export async function updateUnreadMessages(_, payload) {
+  return cycleApi.updateUnreadMessages(payload).then(r => r.result);
+}
