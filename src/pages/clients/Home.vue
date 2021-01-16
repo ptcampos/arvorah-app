@@ -4,13 +4,32 @@
       <div class="col-xs-12 ">
         <div class="row q-pa-md justify-end">
           <q-btn
-            @click="openPendingPRO"
-            :disable="!pendingPRO"
+            @click="openPendingNotifications"
+            :disable="!pendingNotifications || !pendingNotifications.length"
             class="q-ml-sm"
             round
-            :color="pendingPRO ? 'pink' : 'grey'"
+            :color="pendingNotifications && pendingNotifications.length ? 'orange' : 'grey'"
+            icon="eva-bell-outline"
+          >
+            <q-badge
+              v-show="pendingNotifications && pendingNotifications.length"
+              color="red"
+              floating
+            >
+              {{ pendingNotifications.length }}
+            </q-badge>
+          </q-btn>
+          <q-btn
+            @click="openPendingPROs"
+            :disable="!pendingPROs || !pendingPROs.length"
+            class="q-ml-sm"
+            round
+            :color="pendingPROs && pendingPROs.length ? 'pink' : 'grey'"
             label="PRO"
           >
+            <q-badge v-show="pendingPROs && pendingPROs.length" color="red" floating>
+              {{ pendingPROs.length }}
+            </q-badge>
           </q-btn>
           <q-btn
             @click="openScheduleUpdate"
@@ -126,6 +145,44 @@
         </div>
       </q-card>
     </q-dialog>
+
+    <q-dialog persistent v-model="proModal">
+      <q-card style="min-width: 90%;" class="q-pa-sm">
+        <q-toolbar>
+          <q-toolbar-title>
+            <span class="text-h6">{{ currentPROBeingAnswered.Pro.area }}</span>
+          </q-toolbar-title>
+
+          <q-btn flat round dense icon="close" v-close-popup />
+        </q-toolbar>
+
+        <q-form @submit.prevent="savePROAnswers">
+          <q-card-section>
+            <div class="row q-col-gutter-sm">
+              <div
+                class="col-xs-12"
+                :key="proQuestion.id"
+                v-for="(proQuestion, index) in currentPROBeingAnswered.Pro.ProQuestions"
+              >
+                <div class="text-body text-bold">{{ index + 1 }}. {{ proQuestion.question }}:</div>
+                <q-option-group
+                  :required="true"
+                  :options="mappedAnswers(proQuestion.ProQuestionAnswerOptions)"
+                  label="Notifications"
+                  :type="proQuestion.answerType"
+                  v-model="proQuestion.clientAnswer"
+                />
+              </div>
+            </div>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn label="Cancelar" color="negative" no-caps v-close-popup flat />
+            <q-btn type="submit" label="Salvar respostas" color="primary" no-caps flat />
+          </q-card-actions>
+        </q-form>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -160,10 +217,19 @@ export default {
       cycleCronogram: [],
       professionalCycle: null,
       pendingSchedule: null,
-      pendingPRO: null,
+      pendingPROs: [],
+      pendingNotifications: [],
       scheduleActionsModal: false,
       cycleEventsChannel: null,
       pendingMessages: [],
+      proModal: false,
+      currentPROBeingAnswered: {
+        Pro: {
+          ProQuestions: [],
+        },
+        answers: {},
+        questions: [],
+      },
     };
   },
 
@@ -183,6 +249,58 @@ export default {
   },
 
   methods: {
+    mappedAnswers(proAnswers) {
+      return proAnswers.map(answer => ({
+        ...answer,
+        label: answer.answer,
+        value: answer.id,
+      }));
+    },
+    async savePROAnswers() {
+      // validate
+      const currentPRO = this.currentPROBeingAnswered;
+      const pro = currentPRO.Pro;
+      const questions = pro.ProQuestions;
+      const isInvalid = questions.some(question => {
+        // check if empty answer
+        return (
+          !question.clientAnswer ||
+          (question.answerType === 'checkbox' && !question.clientAnswer.length)
+        );
+      });
+      if (isInvalid) {
+        this.$q.notify({
+          message: 'Por favor, responda todas as perguntas para salvar',
+          color: 'negative',
+        });
+        return;
+      }
+      this.$q.loading.show();
+      try {
+        await this.$store.dispatch('cycle/savePROQuestionAnswer', {
+          proMessageScheduleId: currentPRO.id,
+          answers: questions.map(question => ({
+            answer: question.clientAnswer,
+            answerType: question.answerType,
+            proQuestionId: question.id,
+          })),
+        });
+        this.proModal = false;
+        this.$q.notify({
+          message: 'Obrigado pelas suas respostas',
+          color: 'positive',
+        });
+        this.getPendingPRO();
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao salvar as respotas',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
     showDialogAndLinkToPNChat(professional) {
       if (localStorage.getItem('pn-match')) {
         return;
@@ -271,7 +389,60 @@ export default {
     openScheduleUpdate() {
       this.scheduleActionsModal = true;
     },
-    openPendingPRO() {},
+    openPendingPROs() {
+      console.log(this.pendingPROs);
+      const firstPendingPRO = this.pendingPROs[0];
+      if (!firstPendingPRO) {
+        return;
+      }
+      this.currentPROBeingAnswered = {
+        ...firstPendingPRO,
+        Pro: {
+          ...firstPendingPRO.Pro,
+          ProQuestions: firstPendingPRO.Pro.ProQuestions.map(proQuestion => ({
+            ...proQuestion,
+            clientAnswer: proQuestion.answerType === 'checkbox' ? [] : '',
+          })),
+        },
+      };
+      // currentPROBeingAnswered: {
+      //   Pro: {},
+      //   answers: {},
+      //   questions: [],
+      // },
+      this.proModal = true;
+    },
+    async markMessageAsRead(message) {
+      this.$q.loading.show();
+      try {
+        await this.$store.dispatch('cycle/updateMessageNotificationToRead', message.id);
+        await this.getPendingNotifications();
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao atualizar a mensagem',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
+    openPendingNotifications() {
+      const lastNotification = this.pendingNotifications[this.pendingNotifications.length - 1];
+      if (lastNotification) {
+        this.$q
+          .dialog({
+            message: lastNotification.MotivationalMessage.text,
+            persistent: true,
+            ok: {
+              label: 'Marcar como lida',
+              flat: true,
+              noCaps: true,
+            },
+          })
+          .onOk(() => this.markMessageAsRead(lastNotification));
+      }
+    },
     showPrincipaisDoresModal() {
       setTimeout(() => {
         this.$root.$emit('showModal', 'principaisDores');
@@ -422,6 +593,37 @@ export default {
         this.$q.loading.hide();
       }
     },
+    async getPendingNotifications() {
+      this.$q.loading.show();
+      try {
+        const notifications = await this.$store.dispatch('cycle/getNotifications');
+        // console.log(notifications);
+        this.pendingNotifications = notifications.filter(n => n.status === 'sent' && !n.readAt);
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao carregar as notificações pendentes',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
+    async getPendingPRO() {
+      this.$q.loading.show();
+      try {
+        const pros = await this.$store.dispatch('cycle/getPros');
+        this.pendingPROs = pros.filter(n => n.status === 'sent' && !n.answeredAt);
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao carregar os PROs pendentes',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
     onClickContent(item) {
       if (!item.released) {
         return;
@@ -436,6 +638,8 @@ export default {
         this.refreshCycleCronogram();
         this.getProfessionalCycle();
         this.getPendingSchedules();
+        this.getPendingNotifications();
+        this.getPendingPRO();
       }
     },
   },

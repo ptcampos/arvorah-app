@@ -85,6 +85,32 @@ class CycleApi extends CrudApi {
       .post('chat-messages/update-unread-messages', payload)
       .then(r => r.data);
   }
+
+  getPros(params) {
+    return this.axiosInstance
+      .get('pros-schedules', {
+        params,
+      })
+      .then(r => r.data);
+  }
+
+  getNotifications(params) {
+    return this.axiosInstance
+      .get('motivational-schedules', {
+        params,
+      })
+      .then(r => r.data);
+  }
+
+  updateMessageNotificationToRead(messageId) {
+    return this.axiosInstance
+      .put(`motivational-schedules/update-to-read/${messageId}`)
+      .then(r => r.data);
+  }
+
+  savePROQuestionAnswer(payload) {
+    return this.axiosInstance.post('pro-client-answers', payload).then(r => r.data);
+  }
 }
 
 export default CycleApi;

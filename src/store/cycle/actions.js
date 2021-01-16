@@ -83,3 +83,19 @@ export async function getUnreadMessagesFromChat(_, chatId) {
 export async function updateUnreadMessages(_, payload) {
   return cycleApi.updateUnreadMessages(payload).then(r => r.result);
 }
+
+export async function getPros(_, payload) {
+  return cycleApi.getPros(payload).then(r => r.result);
+}
+
+export async function getNotifications(_, payload) {
+  return cycleApi.getNotifications(payload).then(r => r.result);
+}
+
+export async function updateMessageNotificationToRead(_, messageId) {
+  return cycleApi.updateMessageNotificationToRead(messageId).then(r => r.result);
+}
+
+export async function savePROQuestionAnswer(_, payload) {
+  return cycleApi.savePROQuestionAnswer(payload).then(r => r.result);
+}
