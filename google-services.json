@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "734480357515",
+    "project_id": "saude-integrativa",
+    "storage_bucket": "saude-integrativa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734480357515:android:99a8494908c864f6c0dc8e",
+        "android_client_info": {
+          "package_name": "com.saudeintegrativa.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "734480357515-us86f4q3k0u5hlpgmoff2d0nd1jl5f4a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYSiMxVA624UlTD1xvXhWTZ7Q3S2vRcOE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "734480357515-us86f4q3k0u5hlpgmoff2d0nd1jl5f4a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

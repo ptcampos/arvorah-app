@@ -68,6 +68,15 @@ import PrincipaisDoresModal from 'components/modals/PrincipaisDoresModal.vue';
 import CronogramaDoCicloModal from 'components/modals/CronogramaDoCicloModal.vue';
 import { ionMenuOutline } from '@quasar/extras/ionicons-v5';
 
+import {
+  Plugins,
+  // PushNotification,
+  // PushNotificationToken,
+  // PushNotificationActionPerformed,
+} from '@capacitor/core';
+
+const { PushNotifications } = Plugins;
+
 import { goBack } from 'boot/utils';
 
 const linksData = [
@@ -76,26 +85,6 @@ const linksData = [
     icon: 'eva-home-outline',
     link: '/app/client/home',
   },
-  // {
-  //   title: 'Agendar Consulta',
-  //   icon: 'eva-book-outline',
-  //   link: '/app/client/schedule-select-professional',
-  // },
-  // {
-  //   title: 'Compromissos',
-  //   icon: 'eva-calendar-outline',
-  //   link: '/app/client/compromises',
-  // },
-  // {
-  //   title: 'Notificações',
-  //   icon: 'eva-bell-outline',
-  //   link: '/app/client/notifications',
-  // },
-  // {
-  //   title: 'Conteúdo Informativo',
-  //   icon: 'eva-clipboard-outline',
-  //   link: '/app/client/informative-content',
-  // },
   {
     title: 'Configurações',
     icon: 'eva-settings-outline',
@@ -138,10 +127,65 @@ export default {
         this[`${name}Modal`] = false;
       }
     });
+
+    this.saveDeviceToken();
   },
 
   methods: {
     goBack,
+    saveDeviceToken() {
+      PushNotifications.requestPermission().then(result => {
+        if (result.granted) {
+          // Register with Apple / Google to receive push via APNS/FCM
+          PushNotifications.register();
+        } else {
+          // Show some error
+        }
+      });
+
+      // On success, we should be able to receive notifications
+      PushNotifications.addListener('registration', async token => {
+        // save user token on WS
+        this.$q.loading.show();
+        try {
+          await this.$store.dispatch('user/saveDeviceToken', {
+            deviceToken: token.value,
+          });
+        } catch (error) {
+          console.log(error);
+          const message = 'Erro ao salvar o token do dispositivo';
+          this.$q.notify({
+            message,
+            color: 'negative',
+          });
+        } finally {
+          this.$q.loading.hide();
+        }
+      });
+
+      // Some issue with our setup and push will not work
+      PushNotifications.addListener('registrationError', () => {
+        const message = 'Erro ao salvar o token do dispositivo';
+        this.$q.notify({
+          message,
+          color: 'negative',
+        });
+      });
+
+      // Show us the notification payload if the app is open on our device
+      PushNotifications.addListener('pushNotificationReceived', () => {
+        this.$root.$emit('refreshMotivationalMessages');
+        this.$root.$emit('refreshPROMessages');
+        this.$root.$emit('refreshCycleCronogramInformativeContent');
+      });
+
+      // Method called when tapping on a notification
+      PushNotifications.addListener('pushNotificationActionPerformed', () => {
+        this.$root.$emit('refreshMotivationalMessages');
+        this.$root.$emit('refreshPROMessages');
+        this.$root.$emit('refreshCycleCronogramInformativeContent');
+      });
+    },
     signOut() {
       this.$store.dispatch('user/signOut');
       this.$router.push({ path: '/login', query: { type: 'client' } });

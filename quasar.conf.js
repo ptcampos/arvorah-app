@@ -11,8 +11,8 @@
 
 module.exports = function(ctx) {
   const devEnvs = {
-    API_URL: 'http://localhost:3050/api/v1/',
-    WORDPRESS_CONTENT_API: 'http://saudeintegrativa.local',
+    API_URL: 'http://192.168.1.183:3050/api/v1/',
+    WORDPRESS_CONTENT_API: 'http://57c431558198.ngrok.io',
     // API_URL: '"https://manuais-normativos-api.thriade.com/api/v1/"'
   };
   const prodEnvs = {

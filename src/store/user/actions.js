@@ -24,3 +24,7 @@ export async function createProfessional(_, payload) {
 export async function signOut() {
   UserService.removeUser();
 }
+
+export async function saveDeviceToken(_, payload) {
+  await usersApi.saveDeviceToken(payload);
+}

@@ -57,7 +57,6 @@
           <q-toolbar class="bg-grey-3 row">
             <q-form class="full-width" @submit="sendMessage">
               <q-input
-                autofocus
                 bg-color="grey-3"
                 input-class="q-px-sm"
                 placeholder="Mensagem"

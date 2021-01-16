@@ -246,6 +246,25 @@ export default {
     this.$root.$on('refreshCycleCronogram', () => {
       this.init();
     });
+
+    this.$root.$on('refreshMotivationalMessages', () => {
+      this.getPendingNotifications();
+    });
+
+    this.$root.$on('refreshPROMessages', () => {
+      this.getPendingPRO();
+    });
+
+    this.$root.$on('refreshCycleCronogramInformativeContent', () => {
+      this.refreshCycleCronogram();
+    });
+  },
+
+  beforeDestroy() {
+    this.$root.$off('refreshPROMessages');
+    this.$root.$off('refreshMotivationalMessages');
+    this.$root.$off('refreshCycleCronogram');
+    this.$root.$off('refreshClientCurrentCycle');
   },
 
   methods: {
@@ -390,7 +409,6 @@ export default {
       this.scheduleActionsModal = true;
     },
     openPendingPROs() {
-      console.log(this.pendingPROs);
       const firstPendingPRO = this.pendingPROs[0];
       if (!firstPendingPRO) {
         return;
