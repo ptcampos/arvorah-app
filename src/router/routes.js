@@ -92,6 +92,11 @@ const routes = [
         meta: { requiresAuth: true, allowedUsers: ['professional'] },
         component: () => import('pages/Index.vue'),
       },
+      {
+        path: 'settings',
+        meta: { requiresAuth: true, allowedUsers: ['professional', 'user'] },
+        component: () => import('pages/settings/Index.vue'),
+      },
     ],
   },
 

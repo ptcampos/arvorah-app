@@ -15,6 +15,10 @@ class UsersApi extends CrudApi {
   saveDeviceToken(payload) {
     return this.axiosInstance.post('users/save-device-token', payload).then(r => r.data);
   }
+
+  updatePassword(payload) {
+    return this.axiosInstance.post('users/update-password', payload).then(r => r.data);
+  }
 }
 
 export default UsersApi;

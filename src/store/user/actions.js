@@ -28,3 +28,7 @@ export async function signOut() {
 export async function saveDeviceToken(_, payload) {
   await usersApi.saveDeviceToken(payload);
 }
+
+export async function updatePassword(_, payload) {
+  await usersApi.updatePassword(payload);
+}

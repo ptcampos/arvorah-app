@@ -77,7 +77,7 @@
           </div> -->
 
           <q-card-section v-show="currentCycle.startDate">
-            <div class="text-subtitle q-mb-lg">Últimos artigo recomendado:</div>
+            <div class="text-subtitle q-mb-lg">Últimos artigos recomendados:</div>
             <InformativeContentList @onClickItem="onClickContent" :contents="cycleCronogram" />
           </q-card-section>
         </q-card>
@@ -130,6 +130,7 @@
               no-caps
               @click="confirmCancelSchedule"
               v-close-popup
+              :disable="this.pendingSchedule && this.pendingSchedule.status !== 'pending'"
             />
           </div>
           <div class="col-xs-12">
@@ -139,6 +140,17 @@
               color="primary"
               no-caps
               @click="showRescheduleAlert"
+              v-close-popup
+            />
+          </div>
+          <div class="col-xs-12">
+            <q-btn
+              class="full-width"
+              label="Acessar Sala Virtual"
+              color="primary"
+              no-caps
+              @click="openVirtualRoom"
+              :v-if="this.pendingSchedule && this.pendingSchedule.status === 'soon'"
               v-close-popup
             />
           </div>
@@ -268,6 +280,7 @@ export default {
   },
 
   methods: {
+    openVirtualRoom() {},
     mappedAnswers(proAnswers) {
       return proAnswers.map(answer => ({
         ...answer,

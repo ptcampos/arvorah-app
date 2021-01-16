@@ -88,7 +88,7 @@ const linksData = [
   {
     title: 'Configurações',
     icon: 'eva-settings-outline',
-    link: '/app/client/settings',
+    link: '/app/settings',
   },
 ];
 
