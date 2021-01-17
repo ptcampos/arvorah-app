@@ -42,7 +42,13 @@
           </q-btn>
           <q-btn @click="openProfessionalChat" :disable="!professionalCycle" class="q-ml-sm" round>
             <q-avatar size="42px">
-              <img src="https://cdn.quasar.dev/img/avatar2.jpg" />
+              <img
+                :src="
+                  professionalCycle && professionalCycle.avatar
+                    ? professionalCycle.avatar
+                    : 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
+                "
+              />
             </q-avatar>
             <q-badge v-show="pendingMessages && pendingMessages.length" color="red" floating>
               {{ pendingMessages.length }}
@@ -566,6 +572,11 @@ export default {
             status: 'accepted',
           },
         );
+        const professionalAvatar = await this.$store.dispatch(
+          'user/getUserAvatarImage',
+          professionalCycle.Professional.userId,
+        );
+        professionalCycle.avatar = `data:image/png;base64, ${professionalAvatar.base64}`;
         this.professionalCycle = professionalCycle;
         if (professionalCycle) {
           // console.log(professionalCycle);

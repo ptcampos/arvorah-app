@@ -32,3 +32,8 @@ export async function saveDeviceToken(_, payload) {
 export async function updatePassword(_, payload) {
   await usersApi.updatePassword(payload);
 }
+
+export async function getUserAvatarImage(_, userId) {
+  const response = await usersApi.getUserAvatarImage(userId);
+  return response;
+}

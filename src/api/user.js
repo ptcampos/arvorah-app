@@ -19,6 +19,10 @@ class UsersApi extends CrudApi {
   updatePassword(payload) {
     return this.axiosInstance.post('users/update-password', payload).then(r => r.data);
   }
+
+  getUserAvatarImage(userId) {
+    return this.axiosInstance.get(`users/get-user-avatar-image/${userId}`).then(r => r.data);
+  }
 }
 
 export default UsersApi;
