@@ -32,6 +32,15 @@
             </q-badge>
           </q-btn>
           <q-btn
+            @click="openPROReport"
+            :disable="!clientProReport.report"
+            class="q-ml-sm"
+            round
+            :color="clientProReport.report ? 'pink' : 'grey'"
+            label="REL"
+          >
+          </q-btn>
+          <q-btn
             @click="openScheduleUpdate"
             :disable="!pendingSchedule"
             class="q-ml-sm"
@@ -136,7 +145,7 @@
               no-caps
               @click="confirmCancelSchedule"
               v-close-popup
-              :disable="this.pendingSchedule && this.pendingSchedule.status !== 'pending'"
+              v-if="this.pendingSchedule && this.pendingSchedule.Schedule.status === 'pending'"
             />
           </div>
           <div class="col-xs-12">
@@ -153,10 +162,10 @@
             <q-btn
               class="full-width"
               label="Acessar Sala Virtual"
-              color="primary"
+              color="purple"
               no-caps
               @click="openVirtualRoom"
-              :v-if="this.pendingSchedule && this.pendingSchedule.status === 'soon'"
+              v-if="this.pendingSchedule && this.pendingSchedule.Schedule.status === 'soon'"
               v-close-popup
             />
           </div>
@@ -201,6 +210,63 @@
         </q-form>
       </q-card>
     </q-dialog>
+
+    <q-dialog persistent maximized v-model="conferenceModal">
+      <q-card class="q-pa-sm">
+        <q-toolbar>
+          <q-toolbar-title>
+            <span class="text-h6">Sala de Atendimento</span>
+          </q-toolbar-title>
+
+          <q-btn flat round dense icon="close" v-close-popup />
+        </q-toolbar>
+
+        <q-card-section>
+          <div class="row">
+            <div class="col-xs-12 col-sm-12">
+              <div style="width: 100%;">
+                <iframe
+                  :src="
+                    `${conference.url}?embed&iframeSource=example&screenshare=on&people=off&video=on`
+                  "
+                  allow="camera; microphone; fullscreen; speaker; display-capture"
+                  style="width: 100%; height: 60vh;"
+                  ref="iframe"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn label="Fechar" color="negative" no-caps v-close-popup flat />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog persistent maximized v-model="proReportModal">
+      <q-card class="q-pa-sm">
+        <q-toolbar>
+          <q-toolbar-title>
+            <span class="text-h6">Relatório</span>
+          </q-toolbar-title>
+
+          <q-btn flat round dense icon="close" v-close-popup />
+        </q-toolbar>
+
+        <q-card-section>
+          <div class="row">
+            <div class="col-xs-12 col-sm-12">
+              <div style="width: 100%;" v-html="clientProReport.report" />
+            </div>
+          </div>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn label="Fechar" color="negative" no-caps v-close-popup flat />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -227,6 +293,13 @@ export default {
 
   data() {
     return {
+      conferenceModal: false,
+      proReportModal: false,
+      proReport: null,
+      clientProReport: {},
+      conference: {
+        url: '',
+      },
       ionNewspaperOutline,
       ionCalendarOutline,
       ionBookmarksOutline,
@@ -286,7 +359,22 @@ export default {
   },
 
   methods: {
-    openVirtualRoom() {},
+    openPROReport() {
+      this.proReportModal = true;
+    },
+    async openVirtualRoom() {
+      // get professional settings
+      const settings = this.professionalCycle.professionalSettings;
+      if (settings.conferenceUrl) {
+        this.conference.url = settings.conferenceUrl;
+        this.conferenceModal = true;
+      } else {
+        this.$q.notify({
+          color: 'negative',
+          message: 'A Pessoa Navegadora não configurou uma sala virtual',
+        });
+      }
+    },
     mappedAnswers(proAnswers) {
       return proAnswers.map(answer => ({
         ...answer,
@@ -315,7 +403,7 @@ export default {
       }
       this.$q.loading.show();
       try {
-        await this.$store.dispatch('cycle/savePROQuestionAnswer', {
+        const prosStatus = await this.$store.dispatch('cycle/savePROQuestionAnswer', {
           proMessageScheduleId: currentPRO.id,
           answers: questions.map(question => ({
             answer: question.clientAnswer,
@@ -328,6 +416,10 @@ export default {
           message: 'Obrigado pelas suas respostas',
           color: 'positive',
         });
+        if (prosStatus.allAnswered) {
+          this.clientProReport = { ...prosStatus.clientReport };
+          this.proReportModal = true;
+        }
         this.getPendingPRO();
       } catch (error) {
         console.log(error);
@@ -572,6 +664,9 @@ export default {
             status: 'accepted',
           },
         );
+        if (!professionalCycle) {
+          return;
+        }
         const professionalAvatar = await this.$store.dispatch(
           'user/getUserAvatarImage',
           professionalCycle.Professional.userId,
@@ -666,6 +761,21 @@ export default {
         this.$q.loading.hide();
       }
     },
+    async getPROReport() {
+      this.$q.loading.show();
+      try {
+        const clientReport = await this.$store.dispatch('cycle/getProReport');
+        this.clientProReport = clientReport ? { ...clientReport } : {};
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao carregar o PRO Report',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
     onClickContent(item) {
       if (!item.released) {
         return;
@@ -682,6 +792,7 @@ export default {
         this.getPendingSchedules();
         this.getPendingNotifications();
         this.getPendingPRO();
+        this.getPROReport();
       }
     },
   },

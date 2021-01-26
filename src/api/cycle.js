@@ -111,6 +111,10 @@ class CycleApi extends CrudApi {
   savePROQuestionAnswer(payload) {
     return this.axiosInstance.post('pro-client-answers', payload).then(r => r.data);
   }
+
+  getProReport() {
+    return this.axiosInstance.get('client-pro-report/client-report').then(r => r.data);
+  }
 }
 
 export default CycleApi;
