@@ -21,6 +21,7 @@
                 label="E-mail"
                 outlined
                 hide-bottom-space
+                v-model="email"
               />
             </div>
             <div class="col-xs-12">
@@ -42,11 +43,38 @@
 
 <script>
 export default {
+  data() {
+    return {
+      email: '',
+    };
+  },
   methods: {
     goBack() {
       window.history.back();
     },
-    submit() {},
+    async submit() {
+      this.$q.loading.show();
+      try {
+        await this.$store.dispatch('user/recoverPassword', {
+          email: this.email,
+          userType: 'user',
+        });
+        this.$q.notify({
+          message: 'As instruções para recuperar a sua senha foram enviadas para o e-mail',
+          color: 'positive',
+        });
+        this.email = '';
+        this.$router.push('/login');
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao recuperar a senha, check se o e-mail está correto',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
   },
 
   computed: {

@@ -99,3 +99,15 @@ export async function updateMessageNotificationToRead(_, messageId) {
 export async function savePROQuestionAnswer(_, payload) {
   return cycleApi.savePROQuestionAnswer(payload).then(r => r.result);
 }
+
+export async function getProReport() {
+  return cycleApi.getProReport();
+}
+
+export async function getClientProReports() {
+  return cycleApi.getClientProReports();
+}
+
+export async function sendProfessionalCalendarSuggestion(_, chatCode) {
+  return cycleApi.sendProfessionalCalendarSuggestion(chatCode);
+}

@@ -32,6 +32,15 @@
             </q-badge>
           </q-btn>
           <q-btn
+            @click="openPROReports"
+            :disable="!clientProReport.report"
+            class="q-ml-sm"
+            round
+            :color="clientProReport.report ? 'pink' : 'grey'"
+            label="REL"
+          >
+          </q-btn>
+          <q-btn
             @click="openScheduleUpdate"
             :disable="!pendingSchedule"
             class="q-ml-sm"
@@ -42,7 +51,13 @@
           </q-btn>
           <q-btn @click="openProfessionalChat" :disable="!professionalCycle" class="q-ml-sm" round>
             <q-avatar size="42px">
-              <img src="https://cdn.quasar.dev/img/avatar2.jpg" />
+              <img
+                :src="
+                  professionalCycle && professionalCycle.avatar
+                    ? professionalCycle.avatar
+                    : 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
+                "
+              />
             </q-avatar>
             <q-badge v-show="pendingMessages && pendingMessages.length" color="red" floating>
               {{ pendingMessages.length }}
@@ -115,13 +130,23 @@
       <q-card style="min-width: 80%;" class="q-pa-sm">
         <q-toolbar>
           <q-toolbar-title>
-            <span class="text-weight-bold">Ações</span>
+            <span class="text-weight-bold">Consulta Agendada</span>
           </q-toolbar-title>
 
           <q-btn flat round dense icon="close" v-close-popup />
         </q-toolbar>
 
+        <q-separator class="q-mb-sm" />
+
         <div class="row q-col-gutter-sm">
+          <div class="col-xs-12">
+            <span class="text-bold">Data da Consulta: </span
+            >{{
+              pendingSchedule && pendingSchedule.Schedule && pendingSchedule.Schedule.dateHour
+                ? pendingSchedule.Schedule.dateHour
+                : '' | date('DD/MM/YYYY HH:mm')
+            }}
+          </div>
           <div class="col-xs-12">
             <q-btn
               class="full-width"
@@ -130,7 +155,7 @@
               no-caps
               @click="confirmCancelSchedule"
               v-close-popup
-              :disable="this.pendingSchedule && this.pendingSchedule.status !== 'pending'"
+              v-if="this.pendingSchedule && this.pendingSchedule.Schedule.status === 'pending'"
             />
           </div>
           <div class="col-xs-12">
@@ -147,10 +172,10 @@
             <q-btn
               class="full-width"
               label="Acessar Sala Virtual"
-              color="primary"
+              color="purple"
               no-caps
               @click="openVirtualRoom"
-              :v-if="this.pendingSchedule && this.pendingSchedule.status === 'soon'"
+              v-if="this.pendingSchedule && this.pendingSchedule.Schedule.status === 'soon'"
               v-close-popup
             />
           </div>
@@ -195,6 +220,99 @@
         </q-form>
       </q-card>
     </q-dialog>
+
+    <q-dialog persistent maximized v-model="conferenceModal">
+      <q-card class="q-pa-sm">
+        <q-toolbar>
+          <q-toolbar-title>
+            <span class="text-h6">Sala de Atendimento</span>
+          </q-toolbar-title>
+
+          <q-btn flat round dense icon="close" v-close-popup />
+        </q-toolbar>
+
+        <q-card-section>
+          <div class="row">
+            <div class="col-xs-12 col-sm-12">
+              <div style="width: 100%;">
+                <iframe
+                  :src="
+                    `${conference.url}?embed&iframeSource=example&screenshare=on&people=off&video=on`
+                  "
+                  allow="camera; microphone; fullscreen; speaker; display-capture"
+                  style="width: 100%; height: 60vh;"
+                  ref="iframe"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn label="Fechar" color="negative" no-caps v-close-popup flat />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="clientProReportsModal">
+      <q-card class="q-pa-sm">
+        <q-toolbar>
+          <q-toolbar-title>
+            <span class="text-weight-bold">Relatórios</span>
+          </q-toolbar-title>
+
+          <q-btn flat round dense icon="close" v-close-popup />
+        </q-toolbar>
+
+        <q-card-section>
+          <q-list bordered separator>
+            <q-item
+              @click="openPROReport(report)"
+              clickable
+              v-ripple
+              v-for="(report, index) in clientProReports"
+              :key="report.id"
+            >
+              <q-item-section>
+                {{ index + 1 }} -
+                {{ report.createdAt | date('DD/MM/YYYY HH:mm') }}
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions>
+          <q-space />
+          <q-btn v-close-popup flat label="Fechar" color="negative" no-caps />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog persistent maximized v-model="proReportModal">
+      <q-card class="q-pa-sm">
+        <q-toolbar>
+          <q-toolbar-title>
+            <span class="text-h6">Relatório</span>
+          </q-toolbar-title>
+
+          <q-btn flat round dense icon="close" v-close-popup />
+        </q-toolbar>
+
+        <q-card-section>
+          <div class="row">
+            <div class="col-xs-12 col-sm-12">
+              <div style="width: 100%;" v-html="clientProReport.report" />
+            </div>
+          </div>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn label="Fechar" color="negative" no-caps v-close-popup flat />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -221,6 +339,13 @@ export default {
 
   data() {
     return {
+      conferenceModal: false,
+      proReportModal: false,
+      proReport: null,
+      clientProReport: {},
+      conference: {
+        url: '',
+      },
       ionNewspaperOutline,
       ionCalendarOutline,
       ionBookmarksOutline,
@@ -234,6 +359,8 @@ export default {
       scheduleActionsModal: false,
       cycleEventsChannel: null,
       pendingMessages: [],
+      clientProReports: [],
+      clientProReportsModal: false,
       proModal: false,
       currentPROBeingAnswered: {
         Pro: {
@@ -280,7 +407,39 @@ export default {
   },
 
   methods: {
-    openVirtualRoom() {},
+    openPROReport(clientReport) {
+      this.clientProReport = clientReport ? { ...clientReport } : {};
+      this.proReportModal = true;
+    },
+    async openPROReports() {
+      this.$q.loading.show();
+      try {
+        const proReports = await this.$store.dispatch('cycle/getClientProReports');
+        this.clientProReports = proReports;
+        this.clientProReportsModal = true;
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao carregar os relatórios de PRO',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
+    async openVirtualRoom() {
+      // get professional settings
+      const settings = this.professionalCycle.professionalSettings;
+      if (settings.conferenceUrl) {
+        this.conference.url = settings.conferenceUrl;
+        this.conferenceModal = true;
+      } else {
+        this.$q.notify({
+          color: 'negative',
+          message: 'A Pessoa Navegadora não configurou uma sala virtual',
+        });
+      }
+    },
     mappedAnswers(proAnswers) {
       return proAnswers.map(answer => ({
         ...answer,
@@ -309,7 +468,7 @@ export default {
       }
       this.$q.loading.show();
       try {
-        await this.$store.dispatch('cycle/savePROQuestionAnswer', {
+        const prosStatus = await this.$store.dispatch('cycle/savePROQuestionAnswer', {
           proMessageScheduleId: currentPRO.id,
           answers: questions.map(question => ({
             answer: question.clientAnswer,
@@ -322,6 +481,10 @@ export default {
           message: 'Obrigado pelas suas respostas',
           color: 'positive',
         });
+        if (prosStatus.allAnswered) {
+          this.clientProReport = { ...prosStatus.clientReport };
+          this.proReportModal = true;
+        }
         this.getPendingPRO();
       } catch (error) {
         console.log(error);
@@ -354,11 +517,45 @@ export default {
           localStorage.setItem('pn-match', 1);
         });
     },
-    showRescheduleAlert() {
-      this.$q.dialog({
-        title: 'Atenção',
-        message: 'Para reagendar, solicite à sua Pessoa Navegadora pelo Chat',
-      });
+    async showRescheduleAlert() {
+      this.$q
+        .dialog({
+          title: 'Atenção',
+          message: 'Quer mesmo reagendar a consulta? Sua marcação previa será cancelada',
+          ok: {
+            label: 'Sim, reagendar',
+            flat: true,
+            noCaps: true,
+            color: 'primary',
+          },
+          cancel: {
+            label: 'Não',
+            flat: true,
+            noCaps: true,
+            color: 'negative',
+          },
+        })
+        .onOk(async () => {
+          this.$q.loading.show();
+          try {
+            await this.$store.dispatch('cycle/cancelSchedule', this.pendingSchedule.scheduleId);
+            const chat = await this.$store.dispatch(
+              'cycle/createAndOpenChatWithProfessionalInCycle',
+              this.currentCycle.id,
+            );
+            await this.$store.dispatch('cycle/sendProfessionalCalendarSuggestion', chat.code);
+            // ir para o chat
+            this.openProfessionalChat();
+          } catch (error) {
+            console.log(error);
+            this.$q.notify({
+              message: 'Erro ao solicitar novos horários para reagendamento',
+              color: 'negative',
+            });
+          } finally {
+            this.$q.loading.hide();
+          }
+        });
     },
     confirmCancelSchedule() {
       this.$q
@@ -545,7 +742,14 @@ export default {
           'cycle/getCycleCronogram',
           this.currentCycle.id,
         );
-        this.cycleCronogram = cycleCronogram.sort((a, b) => (a.id > b.id ? 1 : -1));
+        // available contents
+        const availableContents = cycleCronogram
+          .filter(c => c.released)
+          .sort((a, b) => (a.date > b.date ? -1 : 1));
+        const notAvailableContents = cycleCronogram
+          .filter(c => !c.released)
+          .sort((a, b) => (a.date > b.date ? 1 : -1));
+        this.cycleCronogram = [...availableContents, ...notAvailableContents];
       } catch (error) {
         // console.log(error);
         this.$q.notify({
@@ -566,6 +770,14 @@ export default {
             status: 'accepted',
           },
         );
+        if (!professionalCycle) {
+          return;
+        }
+        const professionalAvatar = await this.$store.dispatch(
+          'user/getUserAvatarImage',
+          professionalCycle.Professional.userId,
+        );
+        professionalCycle.avatar = `data:image/png;base64, ${professionalAvatar.base64}`;
         this.professionalCycle = professionalCycle;
         if (professionalCycle) {
           // console.log(professionalCycle);
@@ -655,6 +867,21 @@ export default {
         this.$q.loading.hide();
       }
     },
+    async getPROReport() {
+      this.$q.loading.show();
+      try {
+        const clientReport = await this.$store.dispatch('cycle/getProReport');
+        this.clientProReport = clientReport ? { ...clientReport } : {};
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao carregar o PRO Report',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
     onClickContent(item) {
       if (!item.released) {
         return;
@@ -671,6 +898,7 @@ export default {
         this.getPendingSchedules();
         this.getPendingNotifications();
         this.getPendingPRO();
+        this.getPROReport();
       }
     },
   },
