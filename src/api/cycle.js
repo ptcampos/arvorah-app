@@ -111,6 +111,20 @@ class CycleApi extends CrudApi {
   savePROQuestionAnswer(payload) {
     return this.axiosInstance.post('pro-client-answers', payload).then(r => r.data);
   }
+
+  getProReport() {
+    return this.axiosInstance.get('client-pro-report/client-report').then(r => r.data);
+  }
+
+  getClientProReports() {
+    return this.axiosInstance.get('client-pro-report/client-reports').then(r => r.data);
+  }
+
+  sendProfessionalCalendarSuggestion(chatCode) {
+    return this.axiosInstance
+      .post('professional-cycle/send-professional-calendar-suggestion', { chatCode })
+      .then(r => r.data);
+  }
 }
 
 export default CycleApi;

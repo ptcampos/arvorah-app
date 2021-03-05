@@ -25,7 +25,11 @@
                 <template v-slot:avatar>
                   <img
                     class="q-message-avatar q-message-avatar--received"
-                    src="https://cdn.quasar.dev/img/avatar2.jpg"
+                    :src="
+                      message.User.avatar
+                        ? urlApi + 'users/user-avatar/' + message.User.avatar
+                        : 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
+                    "
                   />
                 </template>
               </q-chat-message>
@@ -139,6 +143,7 @@ export default {
   data() {
     return {
       messages: [],
+      urlApi: process.env.API_URL,
       newMessage: '',
       loading: true,
       otherUserTyping: false,
