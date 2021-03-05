@@ -1,9 +1,9 @@
 <template>
   <q-page>
     <q-card>
-      <q-card-title>
+      <q-card-section>
         <div class="q-pa-sm q-pl-md text-h6">Alterar Senha</div>
-      </q-card-title>
+      </q-card-section>
       <q-separator />
       <q-card-section>
         <q-form ref="newPasswordForm" @submit="saveNewPassword">
