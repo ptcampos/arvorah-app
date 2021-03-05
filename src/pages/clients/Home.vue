@@ -32,7 +32,7 @@
             </q-badge>
           </q-btn>
           <q-btn
-            @click="openPROReport"
+            @click="openPROReports"
             :disable="!clientProReport.report"
             class="q-ml-sm"
             round
@@ -130,13 +130,23 @@
       <q-card style="min-width: 80%;" class="q-pa-sm">
         <q-toolbar>
           <q-toolbar-title>
-            <span class="text-weight-bold">Ações</span>
+            <span class="text-weight-bold">Consulta Agendada</span>
           </q-toolbar-title>
 
           <q-btn flat round dense icon="close" v-close-popup />
         </q-toolbar>
 
+        <q-separator class="q-mb-sm" />
+
         <div class="row q-col-gutter-sm">
+          <div class="col-xs-12">
+            <span class="text-bold">Data da Consulta: </span
+            >{{
+              pendingSchedule && pendingSchedule.Schedule && pendingSchedule.Schedule.dateHour
+                ? pendingSchedule.Schedule.dateHour
+                : '' | date('DD/MM/YYYY HH:mm')
+            }}
+          </div>
           <div class="col-xs-12">
             <q-btn
               class="full-width"
@@ -244,6 +254,42 @@
       </q-card>
     </q-dialog>
 
+    <q-dialog v-model="clientProReportsModal">
+      <q-card class="q-pa-sm">
+        <q-toolbar>
+          <q-toolbar-title>
+            <span class="text-weight-bold">Relatórios</span>
+          </q-toolbar-title>
+
+          <q-btn flat round dense icon="close" v-close-popup />
+        </q-toolbar>
+
+        <q-card-section>
+          <q-list bordered separator>
+            <q-item
+              @click="openPROReport(report)"
+              clickable
+              v-ripple
+              v-for="(report, index) in clientProReports"
+              :key="report.id"
+            >
+              <q-item-section>
+                {{ index + 1 }} -
+                {{ report.createdAt | date('DD/MM/YYYY HH:mm') }}
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions>
+          <q-space />
+          <q-btn v-close-popup flat label="Fechar" color="negative" no-caps />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
     <q-dialog persistent maximized v-model="proReportModal">
       <q-card class="q-pa-sm">
         <q-toolbar>
@@ -313,6 +359,8 @@ export default {
       scheduleActionsModal: false,
       cycleEventsChannel: null,
       pendingMessages: [],
+      clientProReports: [],
+      clientProReportsModal: false,
       proModal: false,
       currentPROBeingAnswered: {
         Pro: {
@@ -359,8 +407,25 @@ export default {
   },
 
   methods: {
-    openPROReport() {
+    openPROReport(clientReport) {
+      this.clientProReport = clientReport ? { ...clientReport } : {};
       this.proReportModal = true;
+    },
+    async openPROReports() {
+      this.$q.loading.show();
+      try {
+        const proReports = await this.$store.dispatch('cycle/getClientProReports');
+        this.clientProReports = proReports;
+        this.clientProReportsModal = true;
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao carregar os relatórios de PRO',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
     },
     async openVirtualRoom() {
       // get professional settings
@@ -452,11 +517,45 @@ export default {
           localStorage.setItem('pn-match', 1);
         });
     },
-    showRescheduleAlert() {
-      this.$q.dialog({
-        title: 'Atenção',
-        message: 'Para reagendar, solicite à sua Pessoa Navegadora pelo Chat',
-      });
+    async showRescheduleAlert() {
+      this.$q
+        .dialog({
+          title: 'Atenção',
+          message: 'Quer mesmo reagendar a consulta? Sua marcação previa será cancelada',
+          ok: {
+            label: 'Sim, reagendar',
+            flat: true,
+            noCaps: true,
+            color: 'primary',
+          },
+          cancel: {
+            label: 'Não',
+            flat: true,
+            noCaps: true,
+            color: 'negative',
+          },
+        })
+        .onOk(async () => {
+          this.$q.loading.show();
+          try {
+            await this.$store.dispatch('cycle/cancelSchedule', this.pendingSchedule.scheduleId);
+            const chat = await this.$store.dispatch(
+              'cycle/createAndOpenChatWithProfessionalInCycle',
+              this.currentCycle.id,
+            );
+            await this.$store.dispatch('cycle/sendProfessionalCalendarSuggestion', chat.code);
+            // ir para o chat
+            this.openProfessionalChat();
+          } catch (error) {
+            console.log(error);
+            this.$q.notify({
+              message: 'Erro ao solicitar novos horários para reagendamento',
+              color: 'negative',
+            });
+          } finally {
+            this.$q.loading.hide();
+          }
+        });
     },
     confirmCancelSchedule() {
       this.$q
@@ -643,7 +742,14 @@ export default {
           'cycle/getCycleCronogram',
           this.currentCycle.id,
         );
-        this.cycleCronogram = cycleCronogram.sort((a, b) => (a.id > b.id ? 1 : -1));
+        // available contents
+        const availableContents = cycleCronogram
+          .filter(c => c.released)
+          .sort((a, b) => (a.date > b.date ? -1 : 1));
+        const notAvailableContents = cycleCronogram
+          .filter(c => !c.released)
+          .sort((a, b) => (a.date > b.date ? 1 : -1));
+        this.cycleCronogram = [...availableContents, ...notAvailableContents];
       } catch (error) {
         // console.log(error);
         this.$q.notify({

@@ -37,3 +37,8 @@ export async function getUserAvatarImage(_, userId) {
   const response = await usersApi.getUserAvatarImage(userId);
   return response;
 }
+
+export async function recoverPassword(_, payload) {
+  const response = await usersApi.recoverPassword(payload);
+  return response;
+}

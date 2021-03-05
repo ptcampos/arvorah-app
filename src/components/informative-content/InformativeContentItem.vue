@@ -29,6 +29,9 @@
           content.released ? 'Disponível' : 'Em breve'
         }}</q-badge>
       </div>
+      <div class="text-caption text-grey-8">
+        <q-icon name="eva-calendar-outline" />&nbsp;{{ content.date | date('DD/MM/YYYY') }}
+      </div>
       <div class="text-body" v-html="cmsContent.excerpt.rendered" />
     </q-card-section>
 

@@ -103,3 +103,11 @@ export async function savePROQuestionAnswer(_, payload) {
 export async function getProReport() {
   return cycleApi.getProReport();
 }
+
+export async function getClientProReports() {
+  return cycleApi.getClientProReports();
+}
+
+export async function sendProfessionalCalendarSuggestion(_, chatCode) {
+  return cycleApi.sendProfessionalCalendarSuggestion(chatCode);
+}
