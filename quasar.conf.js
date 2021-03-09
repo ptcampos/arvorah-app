@@ -15,10 +15,7 @@ module.exports = function(ctx) {
     WORDPRESS_CONTENT_API: 'http://saudeintegrativa.local',
     // API_URL: '"https://manuais-normativos-api.thriade.com/api/v1/"'
   };
-  const prodEnvs = {
-    API_URL: 'http://saude-integrativa-api.thriade.com/api/v1/',
-    WORDPRESS_CONTENT_API: 'http://saude-integrativa.thriade.com',
-  };
+  const prodEnvs = {};
 
   return {
     // https://quasar.dev/quasar-cli/supporting-ts
