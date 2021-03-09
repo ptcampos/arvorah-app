@@ -1,6 +1,6 @@
 {
   "appId": "com.saudeintegrativa.app",
-  "appName": "Saude Integrativa",
+  "appName": "Arvorah",
   "bundledWebRuntime": false,
   "npmClient": "yarn",
   "webDir": "www"
