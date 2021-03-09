@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Saude Integrativa</string>
-    <string name="title_activity_main">Saude Integrativa</string>
+    <string name="app_name">Arvorah</string>
+    <string name="title_activity_main">Arvorah</string>
     <string name="package_name">com.saudeintegrativa.app</string>
     <string name="custom_url_scheme">com.saudeintegrativa.app</string>
 </resources>
