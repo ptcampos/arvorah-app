@@ -9,7 +9,17 @@
 /* eslint func-names: 0 */
 /* eslint global-require: 0 */
 
-module.exports = function() {
+module.exports = function(ctx) {
+  const devEnvs = {
+    API_URL: 'http://192.168.1.183:3050/api/v1/',
+    WORDPRESS_CONTENT_API: 'http://saudeintegrativa.local',
+    // API_URL: '"https://manuais-normativos-api.thriade.com/api/v1/"'
+  };
+  const prodEnvs = {
+    API_URL: 'https://api.arvorah.com.br/api/v1/',
+    WORDPRESS_CONTENT_API: 'https://wordpress.arvorah.com.br',
+  };
+
   return {
     // https://quasar.dev/quasar-cli/supporting-ts
     supportTS: false,
@@ -68,6 +78,7 @@ module.exports = function() {
           exclude: /node_modules/,
         });
       },
+      env: ctx.prod ? prodEnvs : devEnvs,
     },
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
