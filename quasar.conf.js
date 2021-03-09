@@ -131,8 +131,8 @@ module.exports = function(ctx) {
       workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: 'Saude Integrativa',
-        short_name: 'Saude Integrativa',
+        name: 'Arvorah',
+        short_name: 'Arvorah',
         description: 'An App to help people organize their health life',
         display: 'standalone',
         orientation: 'portrait',
