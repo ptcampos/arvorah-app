@@ -1,12 +1,6 @@
 <template>
-  <div class="relative-position" v-if="show">
-    <q-card
-      class="wrapper text-primary intensity-select-card"
-      style="width: 700px; max-width: 90vw;"
-      :style="{
-        top: getTopDistance(),
-      }"
-    >
+  <div>
+    <q-card class="text-primary">
       <q-card-section>
         <div class="text-h5 text-center">{{ title }}</div>
         <q-btn
@@ -64,7 +58,7 @@
         </div>
       </q-card-section>
 
-      <q-card-actions class="q-pa-none q-mt-md">
+      <!-- <q-card-actions class="q-pa-none q-mt-md">
         <q-btn
           label="Confirmar"
           no-caps
@@ -76,7 +70,7 @@
             background: getOptionColor(pain),
           }"
         />
-      </q-card-actions>
+      </q-card-actions> -->
     </q-card>
 
     <MoreDetailsAboutPain
@@ -188,13 +182,13 @@ export default {
 </script>
 
 <style scoped>
-.intensity-select-card {
+/* .intensity-select-card {
   position: relative;
   left: -50%;
-}
+} */
 
-.wrapper {
+/* .wrapper {
   position: absolute;
   left: 0;
-}
+} */
 </style>
