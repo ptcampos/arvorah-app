@@ -15,10 +15,8 @@
       <q-carousel-slide name="page1" class="column no-wrap flex-center">
         <q-icon color="secondary" name="eva-briefcase" size="10em" />
         <div class="q-mt-lg text-secondary text-h4 text-bold">
-          Precisa de ajuda para organizar sua rotina?
-        </div>
-        <div class="q-mt-lg text-second-primary text-bold">
-          Tenha o acompanhamento pessoal de um navegador para te auxiliar durante sua jornada
+          Você já pensou em ter um melhor controle da saúde e uma jornada oncológica com mais
+          leveza?
         </div>
         <div class="row" style="margin-top: 60px;">
           <div class="col-xs-12">
@@ -49,10 +47,8 @@
       <q-carousel-slide name="page2" class="column no-wrap flex-center">
         <q-icon color="secondary" name="eva-share" size="10em" />
         <div class="q-mt-lg text-secondary text-h4 text-bold">
-          Quer se manter informado?
-        </div>
-        <div class="q-mt-lg text-second-primary text-bold">
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptates numquam maiores.
+          Intervenções na saúde com práticas integrativas como atividade física, suporte nutricional
+          e psicossocial podem ajudar a superar os desafios!
         </div>
         <div class="row" style="margin-top: 60px;">
           <div class="col-xs-12">
@@ -83,10 +79,7 @@
       <q-carousel-slide name="page3" class="column no-wrap flex-center">
         <q-icon color="secondary" name="eva-file-text" size="10em" />
         <div class="q-mt-lg text-secondary text-h4 text-bold">
-          Lorem ipsum dolor sit amet?
-        </div>
-        <div class="q-mt-lg text-second-primary text-bold">
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptates numquam maiores.
+          Nós da ARVORAH podemos te ajudar a ser protagonista do seu próprio cuidado! Vamos lá?
         </div>
         <div class="row" style="margin-top: 60px;">
           <div class="col-xs-12">
