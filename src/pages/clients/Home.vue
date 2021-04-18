@@ -108,9 +108,9 @@
                   momento.
                 </div>
                 <div class="text-body q-pl-sm q-pr-sm">
-                  Primeiro vamos falar dos seus Principais Desafios, identificá-los nos ajuda a
-                  definir prioridades e a fazer escolhas. Dessa forma, estaremos mais próximos de
-                  atingir nossos objetivos!
+                  Identificar quais são os nossos principais desafios facilita a definição de
+                  prioridades e a tomada de decisões. Por isso, criamos uma lista com alguns
+                  desafios que você possa estar enfrentando nesse momento!
                 </div>
                 <q-btn
                   color="secondary"
@@ -701,7 +701,7 @@ export default {
                 .dialog({
                   title: 'Queremos te conhecer melhor',
                   message:
-                    'Primeiro vamos falar dos seus Principais Desafios, identificá-los nos ajuda a definir prioridades e a fazer escolhas. Dessa forma, estaremos mais próximos de atingir nossos objetivos!',
+                    'Identificar quais são os nossos principais desafios facilita a definição de prioridades e a tomada de decisões. Por isso, criamos uma lista com alguns desafios que você possa estar enfrentando nesse momento, selecione 03 opções!',
                   persistent: true,
                   ok: {
                     label: 'Continuar',

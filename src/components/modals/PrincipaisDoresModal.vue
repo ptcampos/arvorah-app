@@ -6,8 +6,8 @@
     transition-show="flip-down"
     transition-hide="flip-up"
   >
-    <q-card class="text-primary">
-      <q-card-section v-show="step === 'painSelect'">
+    <q-card class="text-primary" v-show="step === 'painSelect'">
+      <q-card-section>
         <q-btn
           icon="eva-arrow-ios-back-outline"
           size="16px"
@@ -17,7 +17,7 @@
           flat
         />
         <div class="text-body text-bold text-center q-mt-md">
-          Selecione {{ requiredAmount }} opções para que possamos personalizar sua jornada:
+          Selecione para que possamos personalizar sua jornada:
         </div>
         <div class="q-mt-sm row q-col-gutter-md">
           <div class="col-sm-3 col-xs-6" :key="option.value" v-for="option in options">
@@ -48,8 +48,10 @@
           </div>
         </div>
       </q-card-section>
+    </q-card>
 
-      <q-card-section v-show="step === 'intensitySelect'">
+    <q-card class="text-primary" v-show="step === 'intensitySelect'">
+      <q-card-section>
         <q-btn
           icon="eva-arrow-ios-back-outline"
           size="13px"
@@ -61,22 +63,39 @@
           :ripple="false"
           flat
         />
-        <div class="text-body text-bold text-center q-mt-md q-mb-sm">
-          O quanto esse desafio interfere no seu dia a dia?
+        <div
+          class="row items-center justify-center text-body text-bold text-center q-mt-md q-mb-sm"
+        >
+          O quanto esses desafios interferem no seu dia a dia?
         </div>
-        <IntensitySelectModal
-          :key="option.value"
-          v-for="(option, index) in optionsToSelectIntensity"
-          :show="option.showIntensitySelect"
-          :title="option.label"
-          :intensity="option.intensity"
-          :order="index + 1"
-          :pain="option.value"
-          @upIntensity="() => onUpIntensity(option)"
-          @downIntensity="() => onDownIntensity(option)"
-          @confirm="() => onConfirmIntensity(option)"
-          @manualChangeIntensity="val => manualSetIntensity(option, val)"
-        />
+        <div class="row q-col-gutter-md">
+          <div
+            class="col-xs-12 col-sm-6"
+            :key="option.value"
+            v-for="(option, index) in optionsToSelectIntensity"
+          >
+            <IntensitySelectModal
+              :show="option.showIntensitySelect"
+              :title="option.label"
+              :intensity="option.intensity"
+              :order="index + 1"
+              :pain="option.value"
+              @upIntensity="() => onUpIntensity(option)"
+              @downIntensity="() => onDownIntensity(option)"
+              @manualChangeIntensity="val => manualSetIntensity(option, val)"
+            />
+          </div>
+        </div>
+        <div class="row q-mt-md">
+          <q-btn
+            label="Confirmar"
+            no-caps
+            class="full-width no-border-radius"
+            size="18px"
+            @click="onConfirmIntensity"
+            color="primary"
+          />
+        </div>
       </q-card-section>
 
       <q-card-section
@@ -251,9 +270,9 @@ export default {
         this.$root.$emit('refreshCycleCronogram');
         this.$root.$emit('refreshClientCurrentCycle');
         this.$q.dialog({
-          title: 'Obrigado pela confiança!',
+          title: 'Obrigado pela interação!',
           message:
-            'Nas próximas 6 semanas abordaremos seus principais desafios através de conteúdos informativos curados pelo nosso time de especialistas! Dividiremos dicas e conhecimentos práticos personalizados que irão te ajudar a enfrentar suas dificuldades, trazendo maior qualidade de vida para o seu dia a dia',
+            'Nas próximas semanas abordaremos seus principais desafios por meio de dicas e conhecimentos práticos elaborados pelo nosso time de especialistas. Com conteúdos personalizados te ajudaremos na melhoria da sua qualidade de vida.',
           persistent: true,
         });
         // this.$root.$emit('showModal', 'cronogramaDoCiclo');
@@ -289,21 +308,14 @@ export default {
     manualSetIntensity(option, val) {
       option.intensity = val;
     },
-    onConfirmIntensity(option) {
-      option.showIntensitySelect = false;
-      option.hidden = true;
-      const countOpened = this.optionsToSelectIntensity.filter(o => o.showIntensitySelect).length;
-      if (countOpened === 0) {
-        this.optionsToSelectIntensity.forEach(o => {
-          const optionOnMainList = this.options.find(oo => oo.value === o.value);
-          if (optionOnMainList) {
-            optionOnMainList.intensity = o.intensity;
-          }
-        });
-        this.saveSelectedOptionsAndClose();
-      }
-      this.optionsWithSelectedIntensity = this.optionsToSelectIntensity.filter(o => o.hidden);
-      // console.log(this.optionsWithSelectedIntensity);
+    onConfirmIntensity() {
+      this.optionsToSelectIntensity.forEach(o => {
+        const optionOnMainList = this.options.find(oo => oo.value === o.value);
+        if (optionOnMainList) {
+          optionOnMainList.intensity = o.intensity;
+        }
+      });
+      this.saveSelectedOptionsAndClose();
     },
   },
 
@@ -318,7 +330,7 @@ export default {
       return this.options.filter(o => o.selected).length;
     },
     blockNextButton() {
-      return this.amountOfSelectedOptions !== this.requiredAmount;
+      return this.amountOfSelectedOptions < this.requiredAmount;
     },
     pendingAmount() {
       return this.requiredAmount - this.amountOfSelectedOptions;
@@ -327,9 +339,9 @@ export default {
       return this.blockNextButton && this.amountOfSelectedOptions > this.requiredAmount;
     },
     buttonLabel() {
-      if (this.blockNextButton && this.pendingAmount < 0) {
-        return 'Selecione somente 3 desafios';
-      }
+      // if (this.blockNextButton && this.pendingAmount < 0) {
+      //   return 'Selecione somente 3 desafios';
+      // }
       if (this.blockNextButton) {
         return `Falta${this.pendingAmount > 1 ? 'm' : ''} ${this.pendingAmount} desafio${
           this.pendingAmount > 1 ? 'es' : ''
