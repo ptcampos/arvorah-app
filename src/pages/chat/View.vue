@@ -21,6 +21,7 @@
                 :name="message.User.firstName"
                 :text="[message.message]"
                 :sent="currentUser && currentUser.id === message.User.id"
+                :stamp="formatDate(message.createdAt)"
               >
                 <template v-slot:avatar>
                   <img
@@ -163,12 +164,14 @@ export default {
 
     this.chatEvents = this.$pusher.subscribe(this.chatCode);
     this.chatEvents.bind('chat-event', data => {
-      const dupMessage = this.messages.find(m => m.id === data.id);
-      if (!dupMessage) {
-        this.messages.push(data);
-        this.updateUnreadMessages([data.id]);
-      }
-      this.scrollBottom();
+      setTimeout(() => {
+        const dupMessage = this.messages.find(m => m.id === data.id);
+        if (!dupMessage) {
+          this.messages.push(data);
+          this.updateUnreadMessages([data.id]);
+        }
+        this.scrollBottom();
+      }, 1500);
     });
     this.chatEvents.bind('chat-typing', data => {
       if (currentUserId) {
@@ -187,6 +190,9 @@ export default {
   },
 
   methods: {
+    formatDate(date) {
+      return moment(date).fromNow();
+    },
     scrolled() {
       // console.log('oi');
     },
@@ -298,6 +304,7 @@ export default {
       this.$q.loading.show();
       try {
         this.messages = await this.$store.dispatch('cycle/getChatMessages', this.chatCode);
+        // console.log(this.messages);
         // batch update new messages case unread
         const unreadMessagesIds = this.messages.filter(m => !m.readMessageAt).map(m => m.id);
         this.scrollBottom();
