@@ -92,7 +92,7 @@
           </div> -->
 
           <q-card-section v-show="currentCycle.startDate">
-            <div class="text-subtitle q-mb-lg">Últimos artigos recomendados:</div>
+            <div class="text-subtitle q-mb-lg">Artigos recomendados:</div>
             <InformativeContentList @onClickItem="onClickContent" :contents="cycleCronogram" />
           </q-card-section>
         </q-card>
@@ -883,9 +883,6 @@ export default {
       }
     },
     onClickContent(item) {
-      if (!item.released) {
-        return;
-      }
       this.$store.dispatch('cycle/setCurrentInformativeContent', item);
       this.$router.push(`/app/client/informative-content/${item.id}`);
     },

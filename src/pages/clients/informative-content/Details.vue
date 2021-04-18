@@ -1,21 +1,20 @@
 <template>
-  <q-page>
+  <q-page padding>
     <div class="row">
-      <img
-        style="width: 100%;"
-        :src="
-          cmsContent._embedded && cmsContent._embedded['wp:featuredmedia']
-            ? cmsContent._embedded['wp:featuredmedia']['0'].source_url
-            : 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif'
-        "
-      />
-    </div>
-    <q-separator />
-    <div class="row q-pa-sm q-col-gutter-sm">
-      <div class="col-xs-12">
-        <!-- <ProfessionalItem :professional="professional" /> -->
+      <div class="offset-sm-3 col-sm-6 col-xs-12">
+        <img
+          style="width: 100%;"
+          :src="
+            cmsContent._embedded && cmsContent._embedded['wp:featuredmedia']
+              ? cmsContent._embedded['wp:featuredmedia']['0'].source_url
+              : 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif'
+          "
+        />
       </div>
-      <div class="col-xs-12" id="informative-content">
+    </div>
+    <q-separator class="q-mt-sm q-mb-sm" />
+    <div class="row q-pa-sm q-col-gutter-sm">
+      <div class="offset-sm-3 col-sm-6 col-xs-12" id="informative-content">
         <div class="text-body text-justify" v-html="cmsContent.content.rendered" />
         <!-- <q-date minimal flat class="full-width" v-model="date" :options="dateOptions" /> -->
         <q-separator class="q-mb-sm" />
@@ -99,7 +98,7 @@ export default {
         // console.log(this.informativeContent);
         const conteudoCompleto = await this.$store.dispatch(
           'informativeContent/getContentById',
-          this.informativeContent.informativeContentCMSId,
+          this.informativeContent.id,
         );
         // console.log(conteudoCompleto);
         // console.log(conteudoCompleto);
@@ -107,11 +106,11 @@ export default {
         this.$root.$emit('changeTitle', this.cmsContent.title.rendered);
       } catch (error) {
         console.log(error);
-        this.$q.notify({
-          message: 'Não foi possível carregar os detalhes do conteúdo',
-          color: 'negative',
-        });
-        return this.$router.push('/app/client/informative-content');
+        // this.$q.notify({
+        //   message: 'Não foi possível carregar os detalhes do conteúdo',
+        //   color: 'negative',
+        // });
+        return this.$router.push('/app/client/home');
       } finally {
         this.$q.loading.hide();
       }

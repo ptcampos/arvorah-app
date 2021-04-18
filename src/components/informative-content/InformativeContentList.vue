@@ -1,20 +1,9 @@
 <template>
-  <transition-group
-    enter-active-class="animated fadeIn"
-    leave-active-class="animated fadeOut"
-    appear
-    :duration="300"
-  >
-    <InformativeContentItem
-      :content="content"
-      :key="content.id"
-      v-for="(content, index) in contents"
-      @onClick="$emit('onClickItem', content)"
-      :style="{
-        'margin-top': index === 0 ? '15px' : '35px',
-      }"
-    />
-  </transition-group>
+  <div class="row q-col-gutter-md">
+    <div :key="content.id" v-for="content in contents" class="col-xs-12 col-sm-6">
+      <InformativeContentItem :content="content" @onClick="$emit('onClickItem', content)" />
+    </div>
+  </div>
 </template>
 
 <script>

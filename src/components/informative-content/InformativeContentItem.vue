@@ -3,31 +3,28 @@
     @click="$emit('onClick', content)"
     class="q-mb-md shadow-1"
     clickable
-    v-ripple
     :disable="!content.released"
   >
-    <div
+    <!-- <div
       class="l-pain-identifier"
       :style="{
         'background-color': getPainBackgroundColor(
           content.InformativeModuleCyclePain.CyclePain.pain,
         ),
       }"
-    />
+    /> -->
     <img
       :src="
         cmsContent._embedded && cmsContent._embedded['wp:featuredmedia']
           ? cmsContent._embedded['wp:featuredmedia']['0'].source_url
-          : 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif'
+          : 'http://placehold.jp/300x300.png'
       "
     />
 
     <q-card-section>
       <div class="text-h6">{{ cmsContent.title.rendered }}</div>
       <div class="text-subtitle2">
-        <q-badge :color="content.released ? 'green' : 'orange'">{{
-          content.released ? 'Disponível' : 'Em breve'
-        }}</q-badge>
+        <q-badge color="green">Disponível</q-badge>
       </div>
       <div class="text-caption text-grey-8">
         <q-icon name="eva-calendar-outline" />&nbsp;{{ content.date | date('DD/MM/YYYY') }}
@@ -37,8 +34,15 @@
 
     <q-separator />
 
-    <q-card-section v-show="content.released">
-      <q-btn class="full-width" label="Leia Mais" no-caps flat color="primary" />
+    <q-card-section>
+      <q-btn
+        @click="$emit('onClick', content)"
+        class="full-width"
+        label="Leia Mais"
+        no-caps
+        flat
+        color="primary"
+      />
     </q-card-section>
 
     <q-inner-loading :showing="loading">
@@ -76,7 +80,7 @@ export default {
     try {
       const conteudoCompleto = await this.$store.dispatch(
         'informativeContent/getContentById',
-        this.content.informativeContentCMSId,
+        this.content.id,
       );
       // console.log(conteudoCompleto);
       this.cmsContent = conteudoCompleto;
