@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar>
+      <q-toolbar class="bg-white">
         <q-btn
           flat
           dense
@@ -10,6 +10,7 @@
           aria-label="Menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
           v-if="!isInternalPage"
+          color="primary"
         />
 
         <q-btn
@@ -20,10 +21,13 @@
           aria-label="Go Back"
           @click="goBack"
           v-if="isInternalPage"
+          color="primary"
         />
 
         <q-toolbar-title class="row items-center">
-          <span class="text-subtitle2">{{ pageTitle }}</span>
+          <span class="text-subtitle2">
+            <img src="~/assets/logo_horizontal.png" style="height: 40px;" alt="" />
+          </span>
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
@@ -97,7 +101,7 @@ export default {
   components: { EssentialLink, PrincipaisDoresModal, CronogramaDoCicloModal },
   data() {
     return {
-      pageTitle: 'Saúde Integrativa',
+      pageTitle: 'Arvorah',
       ionMenuOutline,
       isInternalPage: false,
       leftDrawerOpen: false,
@@ -113,7 +117,7 @@ export default {
     });
 
     this.$root.$on('changeTitle', title => {
-      this.pageTitle = title || 'Saúde Integrativa';
+      this.pageTitle = title || 'Arvorah';
     });
 
     this.$root.$on('showModal', name => {

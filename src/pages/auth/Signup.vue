@@ -2,14 +2,19 @@
   <q-page padding class="bg">
     <q-btn icon="eva-arrow-ios-back-outline" size="16px" @click="goBack" :ripple="false" flat />
     <q-form @submit="submit">
-      <div class="row q-mt-lg q-pl-lg q-pr-lg q-pt-lg">
-        <div class="offset-sm-4 col-sm-4 col-xs-12">
+      <div class="row q-col-gutter-md q-pl-lg q-pr-lg">
+        <div class="offset-md-4 col-md-4">
+          <div class="row">
+            <img src="~/assets/logo_horizontal.png" style="width: 70%;" alt="" />
+          </div>
+        </div>
+        <div class="offset-md-4 col-md-4 col-xs-12">
           <div class="title">
             Cadastro Paciente
             <div class="title-destaque">Preencha os campos abaixo para iniciar</div>
           </div>
         </div>
-        <div class="offset-sm-4 col-sm-4 col-xs-12 q-pt-lg">
+        <div class="offset-md-4 col-md-4 col-xs-12 q-pt-lg">
           <div class="row q-col-gutter-md">
             <div class="col-xs-12">
               <q-input
