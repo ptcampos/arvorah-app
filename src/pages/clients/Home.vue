@@ -19,7 +19,7 @@
               {{ pendingNotifications.length }}
             </q-badge>
           </q-btn>
-          <q-btn
+          <!-- <q-btn
             @click="openPendingPROs"
             :disable="!pendingPROs || !pendingPROs.length"
             class="q-ml-sm"
@@ -39,7 +39,7 @@
             :color="clientProReport.report ? 'pink' : 'grey'"
             label="REL"
           >
-          </q-btn>
+          </q-btn> -->
           <q-btn
             @click="openScheduleUpdate"
             :disable="!pendingSchedule"
