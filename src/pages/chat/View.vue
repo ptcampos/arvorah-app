@@ -306,7 +306,9 @@ export default {
         this.messages = await this.$store.dispatch('cycle/getChatMessages', this.chatCode);
         // console.log(this.messages);
         // batch update new messages case unread
-        const unreadMessagesIds = this.messages.filter(m => !m.readMessageAt).map(m => m.id);
+        const unreadMessagesIds = this.messages
+          .filter(m => !m.readMessageAt && this.currentUser.id !== m.userId)
+          .map(m => m.id);
         this.scrollBottom();
         this.updateUnreadMessages(unreadMessagesIds);
       } catch (error) {
