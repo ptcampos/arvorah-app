@@ -496,27 +496,26 @@ export default {
         this.$q.loading.hide();
       }
     },
-    showDialogAndLinkToPNChat(professional) {
-      if (localStorage.getItem('pn-match')) {
-        return;
-      }
-      this.$q
-        .dialog({
-          title: 'Que legal!',
-          message: `Sabemos o quanto é importante podermos contar com uma rede de apoio e com calor humano durante os momentos desafiadores de nossa vida. Pensando nisso, gostaríamos de te apresentar a uma pessoa muito especial:  Sua navegadora ${professional.nickname}! Ela irá te ajudar a navegar durante todas as etapas de nossa jornada, e garantir que estejamos sempre alinhados com os seus objetivos e prioridades.`,
-          persistent: true,
-          ok: {
-            flat: true,
-            noCaps: true,
-            color: 'primary',
-            label: 'Clique aqui para saber mais',
-          },
-        })
-        .onOk(() => {
-          this.openProfessionalChat();
-          localStorage.setItem('pn-match', 1);
-        });
-    },
+    // showDialogAndLinkToPNChat() {
+    //   // if (localStorage.getItem('pn-match')) {
+    //   // }
+    //   // this.$q
+    //   //   .dialog({
+    //   //     title: 'Que legal!',
+    //   //     message: `Sabemos o quanto é importante podermos contar com uma rede de apoio e com calor humano durante os momentos desafiadores de nossa vida. Pensando nisso, gostaríamos de te apresentar a uma pessoa muito especial:  Sua navegadora ${professional.nickname}! Ela irá te ajudar a navegar durante todas as etapas de nossa jornada, e garantir que estejamos sempre alinhados com os seus objetivos e prioridades.`,
+    //   //     persistent: true,
+    //   //     ok: {
+    //   //       flat: true,
+    //   //       noCaps: true,
+    //   //       color: 'primary',
+    //   //       label: 'Clique aqui para saber mais',
+    //   //     },
+    //   //   })
+    //   //   .onOk(() => {
+    //   //     this.openProfessionalChat();
+    //   //     localStorage.setItem('pn-match', 1);
+    //   //   });
+    // },
     async showRescheduleAlert() {
       this.$q
         .dialog({
@@ -781,7 +780,7 @@ export default {
         this.professionalCycle = professionalCycle;
         if (professionalCycle) {
           // console.log(professionalCycle);
-          this.showDialogAndLinkToPNChat(professionalCycle.Professional);
+          // this.showDialogAndLinkToPNChat(professionalCycle.Professional);
 
           // GET CHAT
           const chat = await this.$store.dispatch(
@@ -807,8 +806,8 @@ export default {
         } else if (!this.cycleEventsChannel) {
           // register pusher event
           this.cycleEventsChannel = this.$pusher.subscribe(`cycle-events-${this.currentCycle.id}`);
-          this.cycleEventsChannel.bind('cycle-pn-match', data => {
-            this.showDialogAndLinkToPNChat(data);
+          this.cycleEventsChannel.bind('cycle-pn-match', () => {
+            // this.showDialogAndLinkToPNChat(data);
           });
         }
       } catch (error) {

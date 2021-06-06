@@ -125,6 +125,12 @@ class CycleApi extends CrudApi {
       .post('professional-cycle/send-professional-calendar-suggestion', { chatCode })
       .then(r => r.data);
   }
+
+  getProfessionalsBasedOnAreas(areas) {
+    return this.axiosInstance
+      .post('professionals/professionals-based-on-areas', { areas })
+      .then(r => r.data);
+  }
 }
 
 export default CycleApi;
