@@ -118,6 +118,93 @@
         </div>
       </q-card-section>
     </q-card>
+
+    <q-card
+      style="min-width: 50%; min-height: 40%;"
+      class="text-primary"
+      v-show="step === 'professionalSelect'"
+    >
+      <q-card-section>
+        <q-btn
+          icon="eva-arrow-ios-back-outline"
+          size="13px"
+          @click="step = 'intensitySelect'"
+          label="Voltar"
+          :ripple="false"
+          flat
+        />
+        <div
+          class="row items-center justify-center text-body text-bold text-center q-mt-md q-mb-sm"
+        >
+          Selecione um Profissional
+        </div>
+        <div class="row q-col-gutter-md">
+          <div class="col-xs-12">
+            <q-list bordered>
+              <q-item
+                clickable
+                v-ripple
+                :key="professional.id"
+                v-for="professional in professionals"
+                @click.native="checkProfessional(professional)"
+                :class="{ 'bg-grey-3': professional.checked }"
+              >
+                <q-item-section avatar>
+                  <q-avatar>
+                    <img src="https://i.imgur.com/vIkpCrP.png" />
+                  </q-avatar>
+                </q-item-section>
+                <q-item-section>
+                  <div class="row">
+                    {{ professional.nickname }}
+                  </div>
+                  <div class="row text-grey">
+                    {{ professional.areas }}
+                  </div>
+                </q-item-section>
+              </q-item>
+            </q-list>
+            <div class="q-card" v-show="!professionals || !professionals.length">
+              <div class="q-card-section">
+                <q-banner class="bg-grey-5 text-black">
+                  Nenhum profissional foi encontrado
+                </q-banner>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row q-mt-md">
+          <q-btn
+            label="Confirmar"
+            no-caps
+            class="full-width no-border-radius"
+            size="18px"
+            @click="onConfirmProfessional"
+            color="primary"
+          />
+        </div>
+      </q-card-section>
+
+      <q-card-section
+        class="intensity-checked"
+        v-show="optionsWithSelectedIntensity && optionsWithSelectedIntensity.length"
+      >
+        <div
+          class="text-center pain-with-checked-intensity"
+          :style="{
+            'background-color': getOptionColor(option),
+            color: 'white',
+            fontSize: '15px',
+          }"
+          :key="index"
+          v-for="(option, index) in optionsWithSelectedIntensity"
+          @click="returnHiddenToIntensitySelect(option)"
+        >
+          {{ option.label }}
+          <q-icon color="white" name="eva-arrow-ios-upward-outline" />
+        </div>
+      </q-card-section>
+    </q-card>
   </q-dialog>
 </template>
 
@@ -219,10 +306,55 @@ export default {
       ],
       optionsToSelectIntensity: [],
       optionsWithSelectedIntensity: [],
+      professionals: [],
     };
   },
 
   methods: {
+    checkProfessional(professional) {
+      this.professionals.forEach(prof => {
+        prof.checked = false;
+      });
+
+      professional.checked = true;
+    },
+    async showProfessionalSelect() {
+      this.step = 'professionalSelect';
+      this.$q.loading.show();
+      try {
+        const professionals = await this.$store.dispatch(
+          'cycle/getProfessionalsBasedOnAreas',
+          this.selectedPains,
+        );
+        this.professionals = professionals.map(professional => ({
+          ...professional,
+          areas: professional.areas
+            ? JSON.parse(professional.areas)
+                .map(a => a.label)
+                .join(', ')
+            : [],
+          checked: false,
+        }));
+      } catch (error) {
+        this.$q.notify({
+          color: 'negative',
+          message: 'Erro ao carregar os Profissionais',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
+    onConfirmProfessional() {
+      const selectedProfessional = this.professionals.find(p => p.checked);
+      if (!selectedProfessional) {
+        return this.$q.notify({
+          color: 'negative',
+          message: 'Selecione um profissional',
+        });
+      }
+      // this.selectedOptions.professionalId = null;
+      return this.saveSelectedOptionsAndClose(selectedProfessional.id);
+    },
     returnHiddenToIntensitySelect(option) {
       const optionObj = this.optionsToSelectIntensity.find(o => o.value === option.value);
       if (optionObj) {
@@ -257,11 +389,11 @@ export default {
       this.optionsToSelectIntensity = this.options.filter(o => o.showIntensitySelect);
       this.step = 'intensitySelect';
     },
-    async saveSelectedOptionsAndClose() {
+    async saveSelectedOptionsAndClose(professionalId) {
       this.$q.loading.show();
       try {
         const selectedOptions = this.selectedPains;
-        await this.$store.dispatch('cycle/create', { selectedOptions });
+        await this.$store.dispatch('cycle/create', { selectedOptions, professionalId });
         this.$q.notify({
           message: 'Seu ciclo foi iniciado com sucesso!',
           color: 'positive',
@@ -269,13 +401,17 @@ export default {
         this.hideModal();
         this.$root.$emit('refreshCycleCronogram');
         this.$root.$emit('refreshClientCurrentCycle');
-        this.$q.dialog({
+        await this.$q.dialog({
+          title: 'Que legal!',
+          message: `Sabemos o quanto é importante podermos contar com uma rede de apoio e com calor humano durante os momentos desafiadores de nossa vida. Pensando nisso, gostaríamos de te apresentar a uma pessoa muito especial! Ele(a) irá te ajudar a navegar durante todas as etapas de nossa jornada, e garantir que estejamos sempre alinhados com os seus objetivos e prioridades.`,
+          persistent: true,
+        });
+        await this.$q.dialog({
           title: 'Obrigado pela interação!',
           message:
             'Nas próximas semanas abordaremos seus principais desafios por meio de dicas e conhecimentos práticos elaborados pelo nosso time de especialistas. Com conteúdos personalizados te ajudaremos na melhoria da sua qualidade de vida.',
           persistent: true,
         });
-        // this.$root.$emit('showModal', 'cronogramaDoCiclo');
       } catch (error) {
         let errorReason = '';
         if (
@@ -315,7 +451,7 @@ export default {
           optionOnMainList.intensity = o.intensity;
         }
       });
-      this.saveSelectedOptionsAndClose();
+      this.showProfessionalSelect();
     },
   },
 

@@ -111,3 +111,7 @@ export async function getClientProReports() {
 export async function sendProfessionalCalendarSuggestion(_, chatCode) {
   return cycleApi.sendProfessionalCalendarSuggestion(chatCode);
 }
+
+export async function getProfessionalsBasedOnAreas(_, areas) {
+  return cycleApi.getProfessionalsBasedOnAreas(areas).then(r => r.result);
+}

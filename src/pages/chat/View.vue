@@ -18,16 +18,16 @@
             <div :key="message.id" v-for="message in messages">
               <q-chat-message
                 v-show="message.senderType !== 'system'"
-                :name="message.User.firstName"
+                :name="message.User ? message.User.firstName : ''"
                 :text="[message.message]"
-                :sent="currentUser && currentUser.id === message.User.id"
+                :sent="currentUser && message.User && currentUser.id === message.User.id"
                 :stamp="formatDate(message.createdAt)"
               >
                 <template v-slot:avatar>
                   <img
                     class="q-message-avatar q-message-avatar--received"
                     :src="
-                      message.User.avatar
+                      message.User && message.User.avatar
                         ? urlApi + 'users/user-avatar/' + message.User.avatar
                         : 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
                     "
