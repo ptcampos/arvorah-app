@@ -4,5 +4,5 @@
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
   
   "vetur.experimental.templateInterpolationService": true,
-  "workbench.colorTheme": "GitHub Dark"
+  "workbench.colorTheme": "Qiita"
 }

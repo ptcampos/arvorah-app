@@ -12,13 +12,13 @@
 module.exports = function(ctx) {
   const devEnvs = {
     API_URL: 'http://192.168.1.183:3050/api/v1/',
-    WORDPRESS_CONTENT_API: 'http://saudeintegrativa.local',
+    WORDPRESS_CONTENT_API: 'http://saude-integrativa.thriade.com',
     PUSHER_KEY: '24cd78c672bbb9f35fcf',
     // API_URL: '"https://manuais-normativos-api.thriade.com/api/v1/"'
   };
   const prodEnvs = {
     API_URL: 'https://api.arvorah.com.br/api/v1/',
-    WORDPRESS_CONTENT_API: 'https://wordpress.arvorah.com.br',
+    WORDPRESS_CONTENT_API: 'https://saude-integrativa.thriade.com',
     PUSHER_KEY: '24cd78c672bbb9f35fcf',
   };
 
@@ -41,7 +41,7 @@ module.exports = function(ctx) {
     extras: [
       // 'ionicons-v4',
       // 'mdi-v5',
-      // 'fontawesome-v5',
+      'fontawesome-v5',
       'eva-icons',
       // 'themify',
       // 'line-awesome',

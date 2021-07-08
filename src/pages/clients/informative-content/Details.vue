@@ -149,16 +149,16 @@ export default {
         this.showedRating = false;
       }
       this.scrollInfo = info;
-      if (
-        info.direction === 'down' &&
-        offsetContent.top < 80 &&
-        !this.ratingDialog &&
-        !this.showedRating &&
-        !this.alreadyAnsweredRating
-      ) {
-        this.ratingDialog = true;
-        this.showedRating = true;
-      }
+      // if (
+      //   info.direction === 'down' &&
+      //   offsetContent.top < 80 &&
+      //   !this.ratingDialog &&
+      //   !this.showedRating &&
+      //   !this.alreadyAnsweredRating
+      // ) {
+      //   this.ratingDialog = true;
+      //   this.showedRating = true;
+      // }
     },
     async saveRating() {
       this.$q.loading.show();

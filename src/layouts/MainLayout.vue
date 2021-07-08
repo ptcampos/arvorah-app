@@ -25,10 +25,14 @@
         />
 
         <q-toolbar-title class="row items-center">
-          <span class="text-subtitle2">
-            <img src="~/assets/logo_horizontal.png" style="height: 40px;" alt="" />
-          </span>
+          <!-- <span class="text-subtitle2">
+            <img src="~/assets/logo_horizontal.png" style="height: 30px;" alt="" />
+          </span> -->
         </q-toolbar-title>
+
+        <q-avatar size="42px" @click="$router.push('/app/settings')">
+          <img :src="'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'" />
+        </q-avatar>
       </q-toolbar>
     </q-header>
 
@@ -42,8 +46,9 @@
     >
       <q-list>
         <q-item-label header class="text-grey-8">
-          Menu
+          Como podemos ajudá-la(o), {{ currentUser ? currentUser.firstName : '' }}?
         </q-item-label>
+        <q-separator />
         <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" />
         <q-item clickable @click.native="signOut">
           <q-item-section avatar>
@@ -79,19 +84,41 @@ import {
   // PushNotificationActionPerformed,
 } from '@capacitor/core';
 
-const { PushNotifications } = Plugins;
-
 import { goBack } from 'boot/utils';
+
+import { getUser } from '../services/User';
+
+const { PushNotifications } = Plugins;
 
 const linksData = [
   {
     title: 'Home',
-    icon: 'eva-home-outline',
+    icon: 'fas fa-home',
     link: '/app/client/home',
   },
   {
-    title: 'Configurações',
-    icon: 'eva-settings-outline',
+    title: 'Agenda',
+    icon: 'fas fa-calendar-alt',
+    link: '/app/client/agenda',
+  },
+  {
+    title: 'Conteúdos Educativos',
+    icon: 'fas fa-book-reader',
+    link: '/app/client/conteudo-educativo',
+  },
+  {
+    title: 'Medicações',
+    icon: 'fas fa-pills',
+    link: '/app/client/medicacoes',
+  },
+  {
+    title: 'Teleconsulta',
+    icon: 'fas fa-desktop',
+    link: '/app/client/teleconsulta',
+  },
+  {
+    title: 'Meu Perfil',
+    icon: 'fas fa-user-cog',
     link: '/app/settings',
   },
 ];
@@ -193,6 +220,11 @@ export default {
     signOut() {
       this.$store.dispatch('user/signOut');
       this.$router.push({ path: '/login', query: { type: 'client' } });
+    },
+  },
+  computed: {
+    currentUser() {
+      return getUser() ? getUser().data : null;
     },
   },
 };

@@ -48,6 +48,7 @@ module.exports = {
 
   // add your custom rules here
   rules: {
+    'no-underscore-dangle': 'off',
     'no-param-reassign': 'off',
 
     'import/first': 'off',
