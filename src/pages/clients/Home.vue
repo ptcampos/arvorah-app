@@ -2,14 +2,14 @@
   <q-page>
     <div class="row">
       <div class="col-xs-12 ">
-        <div class="row q-pa-md justify-end">
+        <div class="row q-pa-md justify-between">
           <q-btn
             @click="openPendingNotifications"
             :disable="!pendingNotifications || !pendingNotifications.length"
             class="q-ml-sm"
             round
             :color="pendingNotifications && pendingNotifications.length ? 'orange' : 'grey'"
-            icon="eva-bell-outline"
+            icon="eva-email-outline"
           >
             <q-badge
               v-show="pendingNotifications && pendingNotifications.length"
@@ -40,7 +40,7 @@
             label="REL"
           >
           </q-btn> -->
-          <q-btn
+          <!-- <q-btn
             @click="openScheduleUpdate"
             :disable="!pendingSchedule"
             class="q-ml-sm"
@@ -48,32 +48,20 @@
             :color="pendingSchedule ? 'blue' : 'grey'"
             icon="eva-calendar-outline"
           >
-          </q-btn>
-          <q-btn @click="openProfessionalChat" :disable="!professionalCycle" class="q-ml-sm" round>
-            <q-avatar size="42px">
-              <img
-                :src="
-                  professionalCycle && professionalCycle.avatar
-                    ? professionalCycle.avatar
-                    : 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
-                "
-              />
-            </q-avatar>
-            <q-badge v-show="pendingMessages && pendingMessages.length" color="red" floating>
-              {{ pendingMessages.length }}
-            </q-badge>
-            <q-icon
-              name="eva-message-square"
-              class="absolute"
-              color="light-green-13"
-              style="bottom: -5px; right: -5px;"
-            />
-          </q-btn>
+          </q-btn> -->
+          <q-btn
+            @click="openProfessionalChat"
+            :disable="!professionalCycle"
+            class="q-ml-sm"
+            icon="eva-message-square"
+            color="primary"
+            round
+          />
         </div>
       </div>
 
       <div class="col-xs-12">
-        <q-card flat bordered class="my-card bg-grey-2">
+        <q-card flat class="my-card">
           <!-- <q-card-section v-if="professionalCycle">
             <CycleProfessional
               :professionalCycle="professionalCycle"
@@ -92,7 +80,16 @@
           </div> -->
 
           <q-card-section v-show="currentCycle.startDate">
-            <div class="text-subtitle q-mb-lg">Artigos recomendados:</div>
+            <div class="text-subtitle q-mb-sm text-primary">Últimos Conteúdos:</div>
+            <InformativeContentList @onClickItem="onClickContent" :contents="cycleCronogram" />
+          </q-card-section>
+        </q-card>
+      </div>
+
+      <div class="col-xs-12">
+        <q-card flat class="my-card">
+          <q-card-section v-show="currentCycle.startDate">
+            <div class="text-subtitle q-mb-sm text-primary">Conteúdos Educativos:</div>
             <InformativeContentList @onClickItem="onClickContent" :contents="cycleCronogram" />
           </q-card-section>
         </q-card>
@@ -679,42 +676,42 @@ export default {
       this.$q.loading.show();
       try {
         const currentUserCycle = await this.$store.dispatch('cycle/getUserCycle');
-        if (!currentUserCycle || !currentUserCycle.active) {
-          // this.showPrincipaisDoresModal();
-          // console.log(UserService.getUser());
-          const name = UserService.getUser().data.firstName;
-          await this.$q
-            .dialog({
-              title: `Seja bem vindo(a) ${name}`,
-              message:
-                'Parabéns por ter aceitado o desafio de assumir o controle de sua própria jornada!. Estamos muito felizes em poder fazer parte de sua história, e seremos sempre gratos pela sua confiança!',
-              persistent: true,
-              ok: {
-                label: 'Continuar',
-                noCaps: true,
-                flat: true,
-              },
-            })
-            .onOk(async () => {
-              await this.$q
-                .dialog({
-                  title: 'Queremos te conhecer melhor',
-                  message:
-                    'Identificar quais são os nossos principais desafios facilita a definição de prioridades e a tomada de decisões. Por isso, criamos uma lista com alguns desafios que você possa estar enfrentando nesse momento, selecione 03 opções!',
-                  persistent: true,
-                  ok: {
-                    label: 'Continuar',
-                    noCaps: true,
-                    flat: true,
-                  },
-                })
-                .onOk(() => {
-                  this.$root.$emit('showModal', 'principaisDores');
-                });
-            });
-        } else {
-          this.currentCycle = currentUserCycle;
-        }
+        // if (!currentUserCycle || !currentUserCycle.active) {
+        //   // this.showPrincipaisDoresModal();
+        //   // console.log(UserService.getUser());
+        //   const name = UserService.getUser().data.firstName;
+        //   await this.$q
+        //     .dialog({
+        //       title: `Seja bem vindo(a) ${name}`,
+        //       message:
+        //         'Parabéns por ter aceitado o desafio de assumir o controle de sua própria jornada!. Estamos muito felizes em poder fazer parte de sua história, e seremos sempre gratos pela sua confiança!',
+        //       persistent: true,
+        //       ok: {
+        //         label: 'Continuar',
+        //         noCaps: true,
+        //         flat: true,
+        //       },
+        //     })
+        //     .onOk(async () => {
+        //       await this.$q
+        //         .dialog({
+        //           title: 'Queremos te conhecer melhor',
+        //           message:
+        //             'Identificar quais são os nossos principais desafios facilita a definição de prioridades e a tomada de decisões. Por isso, criamos uma lista com alguns desafios que você possa estar enfrentando nesse momento, selecione 03 opções!',
+        //           persistent: true,
+        //           ok: {
+        //             label: 'Continuar',
+        //             noCaps: true,
+        //             flat: true,
+        //           },
+        //         })
+        //         .onOk(() => {
+        //           this.$root.$emit('showModal', 'principaisDores');
+        //         });
+        //     });
+        // } else {
+        // }
+        this.currentCycle = currentUserCycle;
       } catch (error) {
         let errorReason = '';
         if (
