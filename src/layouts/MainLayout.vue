@@ -106,11 +106,11 @@ const linksData = [
     icon: 'fas fa-book-reader',
     link: '/app/client/conteudo-educativo',
   },
-  {
-    title: 'Medicações',
-    icon: 'fas fa-pills',
-    link: '/app/client/medicacoes',
-  },
+  // {
+  //   title: 'Medicações',
+  //   icon: 'fas fa-pills',
+  //   link: '/app/client/medicacoes',
+  // },
   {
     title: 'Teleconsulta',
     icon: 'fas fa-desktop',
