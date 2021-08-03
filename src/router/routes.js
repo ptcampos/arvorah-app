@@ -70,6 +70,21 @@ const routes = [
         component: () => import('pages/clients/schedule/SelectProfessional.vue'),
       },
       {
+        path: 'client/conteudo-educativo',
+        meta: { requiresAuth: true, allowedUsers: ['user'] },
+        component: () => import('pages/clients/informative-content/ListConteudoEducativo.vue'),
+      },
+      {
+        path: 'client/agenda',
+        meta: { requiresAuth: true, allowedUsers: ['user'] },
+        component: () => import('pages/clients/schedule/Agenda.vue'),
+      },
+      {
+        path: 'client/teleconsulta',
+        meta: { requiresAuth: true, allowedUsers: ['user'] },
+        component: () => import('pages/clients/teleconsult/List.vue'),
+      },
+      {
         path: 'client/schedule-select-date/:professionalId',
         props: true,
         meta: { requiresAuth: true, allowedUsers: ['user'] },

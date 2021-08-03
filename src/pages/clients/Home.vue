@@ -56,7 +56,11 @@
             icon="eva-message-square"
             color="primary"
             round
-          />
+          >
+            <q-badge v-show="pendingMessages && pendingMessages.length" color="red" floating>
+              {{ pendingMessages.length }}
+            </q-badge>
+          </q-btn>
         </div>
       </div>
 
@@ -86,16 +90,16 @@
         </q-card>
       </div>
 
-      <div class="col-xs-12">
+      <!-- <div class="col-xs-12">
         <q-card flat class="my-card">
           <q-card-section v-show="currentCycle.startDate">
             <div class="text-subtitle q-mb-sm text-primary">Conteúdos Educativos:</div>
             <InformativeContentList @onClickItem="onClickContent" :contents="cycleCronogram" />
           </q-card-section>
         </q-card>
-      </div>
+      </div> -->
 
-      <div class="col-xs-12">
+      <!-- <div class="col-xs-12">
         <q-card flat class="my-card" v-show="!currentCycle.startDate">
           <q-card-section>
             <div class="row q-col-gutter-md">
@@ -120,7 +124,7 @@
             </div>
           </q-card-section>
         </q-card>
-      </div>
+      </div> -->
     </div>
 
     <q-dialog v-model="scheduleActionsModal">
@@ -738,14 +742,13 @@ export default {
           'cycle/getCycleCronogram',
           this.currentCycle.id,
         );
+        console.log(cycleCronogram);
         // available contents
-        const availableContents = cycleCronogram
-          .filter(c => c.released)
-          .sort((a, b) => (a.date > b.date ? -1 : 1));
-        const notAvailableContents = cycleCronogram
-          .filter(c => !c.released)
-          .sort((a, b) => (a.date > b.date ? 1 : -1));
-        this.cycleCronogram = [...availableContents, ...notAvailableContents];
+        const availableContents = cycleCronogram.sort((a, b) => (a.date > b.date ? -1 : 1));
+        // const notAvailableContents = cycleCronogram
+        //   .filter(c => !c.released)
+        //   .sort((a, b) => (a.date > b.date ? 1 : -1));
+        this.cycleCronogram = [...availableContents];
       } catch (error) {
         // console.log(error);
         this.$q.notify({
@@ -886,12 +889,12 @@ export default {
       await this.refreshCurrentCycle();
       this.pendingMessages = [];
       if (this.currentCycle.startDate) {
-        this.refreshCycleCronogram();
-        this.getProfessionalCycle();
-        this.getPendingSchedules();
-        this.getPendingNotifications();
-        this.getPendingPRO();
-        this.getPROReport();
+        await this.getProfessionalCycle();
+        await this.getPendingSchedules();
+        await this.getPendingNotifications();
+        await this.getPendingPRO();
+        await this.getPROReport();
+        await this.refreshCycleCronogram();
       }
     },
   },
