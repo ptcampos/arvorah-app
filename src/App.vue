@@ -25,4 +25,12 @@ export default {
 body {
   font-family: 'Poppins', sans-serif;
 }
+
+.primary--text {
+  color: #416fa4;
+}
+
+.white--text {
+  color: #fcfcfc;
+}
 </style>

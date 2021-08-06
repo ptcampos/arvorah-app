@@ -1,17 +1,27 @@
 <template>
   <q-page padding class="bg">
-    <q-btn icon="eva-arrow-ios-back-outline" size="16px" @click="goBack" :ripple="false" flat />
+    <q-btn
+      class="q-ma-sm shadow-1"
+      icon="eva-arrow-ios-back-outline"
+      size="16px"
+      @click="goBack"
+      :ripple="false"
+      fab-mini
+      color="primary"
+    />
     <q-form @submit="submit">
       <div class="row q-col-gutter-md q-pl-lg q-pr-lg">
         <div class="offset-md-4 col-md-4">
-          <div class="row">
-            <img src="~/assets/logo_horizontal.png" style="width: 70%;" alt="" />
+          <div class="row login-image">
+            <img src="~/assets/logo_vertical.png" style="width: 70%;" alt="" />
           </div>
         </div>
         <div class="offset-md-4 col-md-4 col-xs-12">
-          <div class="title">
-            Cadastro Paciente
-            <div class="title-destaque">Preencha os campos abaixo para iniciar</div>
+          <div class="title text-center white--text text-weight-bold">
+            Cadastro
+            <div class="title-destaque white--text text-weight-bold">
+              Preencha os campos abaixo para iniciar
+            </div>
           </div>
         </div>
         <div class="offset-md-4 col-md-4 col-xs-12 q-pt-lg">
@@ -78,11 +88,19 @@
                 :rules="[val => !!val || 'Campo Obrigatório']"
                 hide-bottom-space
                 bg-color="grey-2"
-                type="password"
+                :type="showPassword ? 'text' : 'password'"
                 label="Senha"
                 outlined
                 v-model="user.password"
-              />
+              >
+                <template v-slot:append>
+                  <q-icon
+                    :name="showPassword ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="showPassword = !showPassword"
+                  />
+                </template>
+              </q-input>
             </div>
             <div class="col-xs-12">
               <q-input
@@ -92,7 +110,7 @@
                 ]"
                 hide-bottom-space
                 bg-color="grey-2"
-                type="password"
+                :type="showPassword ? 'text' : 'password'"
                 label="Confirmar Senha"
                 outlined
                 v-model="user.confirmPassword"
@@ -101,31 +119,19 @@
             <div class="col-xs-12">
               <q-btn
                 type="submit"
-                size="lg"
+                size="md"
                 label="Cadastrar"
                 class="full-width"
                 no-caps
-                color="secondary"
+                color="primary"
               />
-              <p class="text-center q-mt-sm">
-                Ao se cadastrar você aceita com os nossos
+              <p class="text-center q-mt-md white--text">
+                Ao se cadastrar você aceita os nossos
+                <!-- @Todo - Change this url above -->
                 <q-btn
                   @click="openExternalURL('http://google.com')"
-                  style="margin-top: -2px"
-                  color="primary"
+                  style="margin-top: -2px; text-decoration: underline"
                   label="Termos e Condições"
-                  no-caps
-                  flat
-                  dense
-                />
-              </p>
-              <p class="text-center q-mt-sm">
-                Já tem conta?
-                <q-btn
-                  @click="$router.push({ path: '/login', query: { type: 'client' } })"
-                  style="margin-top: -2px"
-                  color="primary"
-                  label="Entrar"
                   no-caps
                   flat
                   dense
@@ -154,6 +160,7 @@ export default {
         password: '',
         confirmPassword: '',
       },
+      showPassword: false,
     };
   },
 
@@ -220,15 +227,22 @@ export default {
 
 .title-destaque
   font-size: 18px;
-  color: $primary
   font-weight: 400;
 
 .bg
-  padding-top: 30px;
-  background: url(~assets/bg-welcome.png)  no-repeat center center fixed
-  background-position: 0 120px;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
+  background-image: linear-gradient(180deg, rgba(213,213,213, .6) 0%, rgba(4,146,149, .7) 100%), url(~assets/tree.jpg)
+  background-position: center center
+  background-repeat: no-repeat
+
+.login-image
+  display: flex
+  justify-content: center
+  align-items: center
+  padding: 10px
+  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, .8) 30%, rgba(255, 255, 255, .5) 50%, rgba(255, 255, 255, .4) 60%, rgba(255, 255, 255, 0) 70%) no-repeat center center;
+  background-size: 250px 250px
+  height: 250px;
+
+.login-image img
+  width: 50% !important
 </style>

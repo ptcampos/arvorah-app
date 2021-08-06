@@ -10,14 +10,8 @@
     <q-form @submit="submit">
       <div class="row q-col-gutter-md q-pl-lg q-pr-lg">
         <div class="offset-md-4 col-md-4">
-          <div class="row">
-            <img src="~/assets/logo_horizontal.png" style="width: 70%;" alt="" />
-          </div>
-        </div>
-        <div class="offset-sm-4 col-sm-4 col-xs-12">
-          <div class="title">
-            Login {{ accountTypeFormatted }}
-            <div class="title-destaque">Preencha os campos abaixo para iniciar</div>
+          <div class="row login-image">
+            <img src="~/assets/logo_vertical.png" style="width: 70%;" alt="" />
           </div>
         </div>
         <div class="offset-sm-4 col-sm-4 col-xs-12 q-pt-lg">
@@ -38,16 +32,24 @@
                 :rules="[val => !!val || 'Campo Obrigatório']"
                 hide-bottom-space
                 bg-color="grey-2"
-                type="password"
+                :type="showPassword ? 'text' : 'password'"
                 label="Senha"
                 v-model="user.password"
                 outlined
-              />
+              >
+                <template v-slot:append>
+                  <q-icon
+                    :name="showPassword ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="showPassword = !showPassword"
+                  />
+                </template>
+              </q-input>
               <q-btn
                 @click="$router.push('/forgot-password')"
-                label="Esqueceu a senha?"
+                label="Esqueci a minha senha"
                 flat
-                class="q-mt-sm float-right"
+                class="q-mt-sm float-left white--text"
                 dense
                 no-caps
               />
@@ -55,20 +57,20 @@
             <div class="col-xs-12">
               <q-btn
                 type="submit"
-                size="lg"
+                size="md"
                 label="Entrar"
                 class="full-width"
                 no-caps
-                color="secondary"
+                color="primary"
               />
-              <p class="text-center q-mt-sm">
-                Ainda não tem conta?
+            </div>
+            <div class="col-xs-12 q-mt-md text-center">
+              <p class="q-mt-sm white--text">
                 <q-btn
                   @click="goToTypeRegister"
                   style="margin-top: -2px"
-                  color="primary"
-                  label="Registrar"
-                  no-caps
+                  color="white"
+                  label="Criar uma conta"
                   flat
                   dense
                 />
@@ -89,6 +91,7 @@ export default {
         email: '',
         password: '',
       },
+      showPassword: false,
     };
   },
 
@@ -162,11 +165,19 @@ export default {
   font-weight: 400;
 
 .bg
-  padding-top: 30px;
-  background: url(~assets/bg-welcome.png)  no-repeat center center fixed
-  background-position: 0 120px;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
+  background-image: linear-gradient(180deg, rgba(213,233,233, .6) 0%, rgba(4,146,149, .8) 100%), url(~assets/tree.jpg)
+  background-position: center center
+  background-repeat: no-repeat
+
+.login-image
+  display: flex
+  justify-content: center
+  align-items: center
+  padding: 10px
+  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, .8) 30%, rgba(255, 255, 255, .5) 50%, rgba(255, 255, 255, .4) 60%, rgba(255, 255, 255, 0) 70%) no-repeat center center;
+  background-size: 250px 250px
+  height: 250px;
+
+.login-image img
+  width: 50% !important
 </style>
