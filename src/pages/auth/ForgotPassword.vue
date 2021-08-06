@@ -1,12 +1,20 @@
 <template>
   <q-page padding class="bg">
-    <q-btn icon="eva-arrow-ios-back-outline" size="16px" @click="goBack" :ripple="false" flat />
+    <q-btn
+      class="q-ma-sm shadow-1"
+      icon="eva-arrow-ios-back-outline"
+      size="16px"
+      @click="goBack"
+      :ripple="false"
+      fab-mini
+      color="primary"
+    />
     <q-form @submit="submit">
       <div class="row q-mt-lg q-pl-lg q-pr-lg q-pt-lg">
         <div class="offset-sm-4 col-sm-4 col-xs-12">
-          <div class="title">
+          <div class="title text-center white--text text-weight-bold">
             Esqueceu a senha?
-            <div class="title-destaque">
+            <div class="title-destaque text-center white--text">
               Não se preocupe, coloque o seu e-mail abaixo que iremos recuperá-la
             </div>
           </div>
@@ -27,11 +35,11 @@
             <div class="col-xs-12">
               <q-btn
                 type="submit"
-                size="lg"
+                size="md"
                 label="Resetar Senha"
                 class="full-width"
                 no-caps
-                color="secondary"
+                color="primary"
               />
             </div>
           </div>
@@ -108,15 +116,10 @@ export default {
 
 .title-destaque
   font-size: 18px;
-  color: $primary
   font-weight: 400;
 
 .bg
-  padding-top: 30px;
-  background: url(~assets/bg-welcome.png)  no-repeat center center fixed
-  background-position: 0 120px;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
+  background-image: linear-gradient(180deg, rgba(213,213,213, .6) 0%, rgba(4,146,149, .7) 100%), url(~assets/tree.jpg)
+  background-position: center center
+  background-repeat: no-repeat
 </style>
