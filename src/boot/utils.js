@@ -282,3 +282,24 @@ export const painColor = pain => {
       return '#000000';
   }
 };
+
+export const formattedEventType = type => {
+  switch (type) {
+    case 'teleconsulta':
+      return 'Teleconsulta';
+    case 'exame':
+      return 'Exame';
+    case 'outra-atividade':
+      return 'Outra Atividade';
+    default:
+      return type;
+  }
+};
+
+export const formattedDate = dateHour => {
+  return moment(dateHour).format('DD/MM/YYYY');
+};
+
+export const formattedHour = dateHour => {
+  return moment(dateHour).format('HH:mm');
+};

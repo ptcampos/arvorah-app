@@ -80,6 +80,11 @@ const routes = [
         component: () => import('pages/clients/schedule/Agenda.vue'),
       },
       {
+        path: 'client/agenda/new',
+        meta: { requiresAuth: true, allowedUsers: ['user'] },
+        component: () => import('pages/clients/schedule/NewSchedule.vue'),
+      },
+      {
         path: 'client/teleconsulta',
         meta: { requiresAuth: true, allowedUsers: ['user'] },
         component: () => import('pages/clients/teleconsult/List.vue'),

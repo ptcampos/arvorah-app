@@ -31,9 +31,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    value: {
-      type: String,
-    },
+    value: {},
     options: {
       type: Array,
       required: true,
@@ -48,6 +46,7 @@ export default {
     updateValue($event) {
       // console.log($event)
       this.$emit('input', $event);
+      this.$emit('change', $event);
     },
     checkRequired(val) {
       if (!this.required) {
