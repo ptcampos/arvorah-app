@@ -9,9 +9,6 @@
         />
       </template>
     </q-virtual-scroll>
-    <!-- <div :key="content.id" v-for="content in contents" class="col-xs-12 col-sm-6">
-
-    </div> -->
   </div>
 </template>
 
@@ -25,11 +22,8 @@ export default {
       default: () => [],
     },
   },
-
   components: {
     InformativeContentItem,
   },
 };
 </script>
-
-<style lang="sass" scoped></style>

@@ -7,7 +7,7 @@
           :src="
             cmsContent._embedded && cmsContent._embedded['wp:featuredmedia']
               ? cmsContent._embedded['wp:featuredmedia']['0'].source_url
-              : 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif'
+              : defaultImg
           "
         />
       </div>
@@ -52,6 +52,8 @@
 import { openExternalURL } from 'boot/utils';
 import { dom } from 'quasar';
 
+const defaultImg = require('../../../assets/logo_horizontal.png');
+
 // Offset on screen
 const { offset } = dom;
 
@@ -82,6 +84,7 @@ export default {
       scrollInfo: {},
       showedRating: false,
       alreadyAnsweredRating: true,
+      defaultImg,
     };
   },
 

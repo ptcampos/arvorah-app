@@ -14,18 +14,10 @@
           ),
         }"
       /> -->
-      <div
-        class="img"
-        :style="{
-          background: getBgImage(cmsContent),
-        }"
-      />
+      <div class="img" :style="getBgImage(cmsContent)" />
 
-      <q-card-section class="card-section-body">
+      <q-card-section v-if="!loading" class="card-section-body">
         <div class="title" v-html="cmsContent.title.rendered"></div>
-        <!-- <div class="text-subtitle2">
-          <q-badge color="green">Disponível</q-badge>
-        </div> -->
         <div class="text-body" v-html="cmsContent.excerpt.rendered" />
       </q-card-section>
 
@@ -37,11 +29,15 @@
         </div>
       </q-card-section>
 
-      <q-inner-loading :showing="loading">
-        <q-spinner color="primary" size="50px" />
+      <q-inner-loading
+        :showing="loading"
+        class="column items-center justify-center"
+        style="height: 150px"
+      >
+        <q-spinner color="primary" size="40px" />
       </q-inner-loading>
     </q-card>
-    <q-btn
+    <!-- <q-btn
       @click="$emit('onClick', content)"
       class="full-width"
       label="Leia Mais"
@@ -49,13 +45,15 @@
       flat
       color="primary"
       dense
-    />
+    /> -->
   </div>
 </template>
 
 <script>
 import { painColor } from 'boot/utils';
 import { ionLocationOutline } from '@quasar/extras/ionicons-v5';
+
+const defaultImg = require('../../assets/logo_horizontal.png');
 
 export default {
   props: {
@@ -73,6 +71,7 @@ export default {
         title: {},
         excerpt: {},
       },
+      placeholderImg: 'http://placehold.jp/300x300.png',
     };
   },
 
@@ -84,7 +83,6 @@ export default {
         'informativeContent/getContentById',
         this.content.id,
       );
-      // console.log(conteudoCompleto);
       this.cmsContent = conteudoCompleto;
     } catch (error) {
       console.log(error);
@@ -99,11 +97,18 @@ export default {
 
   methods: {
     getBgImage(cmsContent) {
-      const url =
+      const style =
         cmsContent._embedded && cmsContent._embedded['wp:featuredmedia']
-          ? cmsContent._embedded['wp:featuredmedia']['0'].source_url
-          : 'http://placehold.jp/300x300.png';
-      return `url(${url})`;
+          ? { background: `url(${cmsContent._embedded['wp:featuredmedia']['0'].source_url})` }
+          : {
+              ...(this.loading && { background: `url(${this.placeholderImg})` }),
+              ...(!this.loading && {
+                background: `url(${defaultImg}) no-repeat center center`,
+                backgroundSize: '75%',
+              }),
+            };
+
+      return style;
     },
     getPainBackgroundColor(pain) {
       return painColor(pain);
@@ -133,6 +138,7 @@ export default {
 
 .img
   height: 120px;
+  width: 200px;
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
