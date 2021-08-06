@@ -889,12 +889,12 @@ export default {
       await this.refreshCurrentCycle();
       this.pendingMessages = [];
       if (this.currentCycle.startDate) {
-        await this.getProfessionalCycle();
-        await this.getPendingSchedules();
-        await this.getPendingNotifications();
-        await this.getPendingPRO();
-        await this.getPROReport();
-        await this.refreshCycleCronogram();
+        this.getProfessionalCycle();
+        this.getPendingSchedules();
+        this.getPendingNotifications();
+        this.getPendingPRO();
+        this.getPROReport();
+        this.refreshCycleCronogram();
       }
     },
   },

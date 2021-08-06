@@ -12,6 +12,7 @@
     hide-bottom-space
     :rules="[val => !!checkRequired(val) || 'Campo obrigatório', ...aditionalRules]"
     bg-color="grey-2"
+    :readonly="blocked"
   />
 </template>
 
@@ -30,9 +31,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    value: {
-      type: String,
-    },
+    value: {},
     mask: {
       type: String,
       required: false,
@@ -53,6 +52,10 @@ export default {
     type: {
       type: String,
       required: false,
+    },
+    blocked: {
+      type: Boolean,
+      default: false,
     },
   },
 

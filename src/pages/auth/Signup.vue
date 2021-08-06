@@ -137,6 +137,17 @@
                   dense
                 />
               </p>
+              <p class="text-center q-mt-md white--text">
+                Já possui cadastro?
+                <q-btn
+                  @click="$router.push('/login')"
+                  style="margin-top: -2px; text-decoration: underline"
+                  label="Clique Aqui"
+                  no-caps
+                  flat
+                  dense
+                />
+              </p>
             </div>
           </div>
         </div>
