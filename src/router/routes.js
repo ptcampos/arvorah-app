@@ -96,6 +96,16 @@ const routes = [
         component: () => import('pages/clients/teleconsult/List.vue'),
       },
       {
+        path: 'client/nova-teleconsulta',
+        meta: { requiresAuth: true, allowedUsers: ['user'] },
+        component: () => import('pages/clients/teleconsult/New-Teleconsult.vue'),
+      },
+      {
+        path: 'client/editar-teleconsulta',
+        meta: { requiresAuth: true, allowedUsers: ['user'] },
+        component: () => import('pages/clients/teleconsult/Update-Teleconsult.vue'),
+      },
+      {
         path: 'client/schedule-select-date/:professionalId',
         props: true,
         meta: { requiresAuth: true, allowedUsers: ['user'] },

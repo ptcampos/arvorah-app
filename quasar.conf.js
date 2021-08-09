@@ -11,7 +11,7 @@
 
 module.exports = function(ctx) {
   const devEnvs = {
-    API_URL: 'http://192.168.1.183:3050/api/v1/',
+    API_URL: 'http://localhost:3050/api/v1/',
     WORDPRESS_CONTENT_API: 'http://saude-integrativa.thriade.com',
     PUSHER_KEY: '24cd78c672bbb9f35fcf',
     // API_URL: '"https://manuais-normativos-api.thriade.com/api/v1/"'
@@ -93,7 +93,7 @@ module.exports = function(ctx) {
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {
       iconSet: 'material-icons', // Quasar icon set
-      lang: 'en-us', // Quasar language pack
+      lang: 'pt-br', // Quasar language pack
       config: {
         notify: {
           position: 'bottom-right',

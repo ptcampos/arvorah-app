@@ -7,6 +7,10 @@ class ProfessionalsApi extends CrudApi {
   constructor() {
     super('professionals');
   }
+
+  getAreas() {
+    return this.axiosInstance.get('areas').then(r => r.data);
+  }
 }
 
 export default ProfessionalsApi;
