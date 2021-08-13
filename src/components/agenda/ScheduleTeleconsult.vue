@@ -1,6 +1,10 @@
 <template>
   <div class="row q-col-gutter-sm">
     <div class="col-12">
+      <!-- {
+            label: 'Fisioterapia',
+            value: 'fisioterapia',
+          }, -->
       <SelectInput
         label="Escolha uma especialidade"
         :options="[
@@ -9,8 +13,16 @@
             value: 'enfermagem',
           },
           {
-            label: 'Fisioterapia',
-            value: 'fisioterapia',
+            label: 'Cardiologia',
+            value: 'cardiologia',
+          },
+          {
+            label: 'Psicologia',
+            value: 'psicologia',
+          },
+          {
+            label: 'Nutrição',
+            value: 'nutricao',
           },
         ]"
         @change="updateProfessionalsList"

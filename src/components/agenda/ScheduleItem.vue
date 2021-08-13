@@ -1,29 +1,69 @@
 <template>
   <div class="row q-mb-md q-col-gutter-sm">
     <div class="col-12">
-      <div class="text-body text-bold">{{ formattedEventType(formattedEvent.Schedule.type) }}</div>
+      <div class="text-body text-bold">
+        {{ formattedEventType(formattedEvent.Schedule.type) }} -
+        <q-badge :color="getEventStatusColor(formattedEvent.Schedule.status)">{{
+          getEventStatusDescription(formattedEvent.Schedule.status)
+        }}</q-badge>
+      </div>
     </div>
-    <div class="col-4">
+    <div class="col-xs-12 col-sm-3 col-md-3">
       <TextInput
         :label="getLabel(formattedEvent.Schedule)"
         :value="getValue(formattedEvent.Schedule)"
         :blocked="true"
       />
     </div>
-    <div class="col-4">
+    <div class="col-xs-6 col-sm-3 col-md-3">
       <TextInput
         label="Data"
         :value="formattedDate(formattedEvent.Schedule.dateHour)"
         :blocked="true"
       />
     </div>
-    <div class="col-4">
+    <div class="col-xs-6 col-sm-3 col-md-3">
       <TextInput
         label="Hora"
         :value="formattedHour(formattedEvent.Schedule.dateHour)"
         :blocked="true"
       />
     </div>
+    <div class="col-xs-12 col-sm-3 col-md-3">
+      <div class="row items-center justify-center" style="height: 100%;">
+        <q-btn
+          @click="$router.push(`/app/client/agenda/edit/${formattedEvent.id}`)"
+          color="primary"
+          no-caps
+          icon="eva-edit"
+          outline
+          :disable="!isAbbleToChangeEvent(formattedEvent.Schedule.status)"
+        />
+        <q-btn
+          @click="confirmRemoveEvent(formattedEvent)"
+          color="negative"
+          class="q-ml-sm"
+          no-caps
+          icon="eva-trash"
+          outline
+          :disable="!isAbbleToChangeEvent(formattedEvent.Schedule.status)"
+        />
+      </div>
+    </div>
+
+    <q-dialog v-model="confirm" persistent @hide="scheduleToRemoveId = null">
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-avatar icon="eva-trash" color="negative" text-color="white" />
+          <span class="q-ml-sm">Quer mesmo cancelar o evento?</span>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Não" color="primary" v-close-popup />
+          <q-btn flat label="Sim, remover" color="negative" @click="cancelSelectedEvent" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -34,6 +74,13 @@ import TextInput from 'components/TextInput';
 export default {
   props: ['event'],
 
+  data() {
+    return {
+      confirm: false,
+      scheduleToRemoveId: null,
+    };
+  },
+
   components: {
     TextInput,
   },
@@ -42,6 +89,62 @@ export default {
     formattedEventType,
     formattedDate,
     formattedHour,
+    isAbbleToChangeEvent(status) {
+      return ['pending'].includes(status);
+    },
+    getEventStatusDescription(status) {
+      switch (status) {
+        case 'pending':
+          return 'Pendente';
+        case 'canceled':
+          return 'Cancelado';
+        case 'occurred':
+          return 'Já ocorreu';
+        case 'soon':
+          return 'Em Breve';
+        default:
+          return status;
+      }
+    },
+    getEventStatusColor(status) {
+      switch (status) {
+        case 'pending':
+          return 'primary';
+        case 'canceled':
+          return 'negative';
+        case 'occurred':
+          return 'positive';
+        case 'soon':
+          return 'purple';
+        default:
+          return 'black';
+      }
+    },
+    confirmRemoveEvent(schedule) {
+      this.scheduleToRemoveId = schedule.Schedule.id;
+      this.confirm = true;
+    },
+    async cancelSelectedEvent() {
+      this.$q.loading.show();
+      try {
+        await this.$axios.put(`/schedule/cancel/${this.scheduleToRemoveId}`);
+        this.$q.notify({
+          message: 'O evento foi cancelado',
+          color: 'positive',
+        });
+        this.$emit('canceledEvent');
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao cancelar o evento',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+        this.confirm = false;
+        this.scheduleToRemoveId = null;
+      }
+    },
     getLabel(schedule) {
       switch (schedule.type) {
         case 'teleconsulta':
@@ -54,10 +157,15 @@ export default {
           return schedule.type;
       }
     },
+    getProfessionalName(schedule) {
+      const professional = schedule.ScheduleUsers.find(user => user.User.roles === 'professional');
+      return professional ? professional.User.fullName : 'Profissional Selecionado';
+    },
     getValue(schedule) {
       switch (schedule.type) {
         case 'teleconsulta':
-          return schedule.ScheduleUsers[0].User.fullName;
+          // get professional user
+          return this.getProfessionalName(schedule);
         case 'exame':
           return schedule.examName;
         case 'outra-atividade':

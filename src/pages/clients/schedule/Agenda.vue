@@ -10,6 +10,7 @@
           :event="scheduleEvent"
           :key="scheduleEvent.id"
           v-for="scheduleEvent in scheduledEvents"
+          @canceledEvent="updateEventsList"
         />
         <q-banner class="bg-grey-5 text-black" v-show="!scheduledEvents || !scheduledEvents.length">
           Você ainda não agendou nenhum compromisso
@@ -62,6 +63,9 @@ export default {
       } finally {
         this.$q.loading.hide();
       }
+    },
+    updateEventsList() {
+      this.init();
     },
   },
 };
