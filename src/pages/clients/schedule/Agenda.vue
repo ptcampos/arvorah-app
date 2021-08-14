@@ -2,7 +2,9 @@
   <q-page>
     <q-card>
       <q-card-section>
-        <div class="q-pa-sm q-pl-md text-h6">Próximos Compromissos</div>
+        <div class="col-xs-12 text-center primary--text">
+          <h5>Próximos Compromissos</h5>
+        </div>
       </q-card-section>
       <q-separator />
       <q-card-section>
@@ -20,6 +22,7 @@
         <q-btn
           @click="$router.push('/app/client/agenda/new')"
           color="primary"
+          class="full-width"
           label="Agendar novo compromisso"
           no-caps
         />

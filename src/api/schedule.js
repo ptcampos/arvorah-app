@@ -13,8 +13,10 @@ class SchedulesApi extends CrudApi {
     return r.data;
   }
 
-  async getSchedules() {
-    const r = await this.axiosInstance.get('schedule/user-schedules');
+  async getSchedules(params = {}) {
+    const r = await this.axiosInstance.get('schedule/user-schedules', {
+      params,
+    });
     return r.data;
   }
 

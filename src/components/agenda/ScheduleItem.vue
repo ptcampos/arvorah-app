@@ -13,6 +13,11 @@
         :label="getLabel(formattedEvent.Schedule)"
         :value="getValue(formattedEvent.Schedule)"
         :blocked="true"
+        additionalClasses="text--white teleconsultation-input q-mb-sm"
+        label-color="white"
+        bg-color="primary"
+        filled
+        dense
       />
     </div>
     <div class="col-xs-6 col-sm-3 col-md-3">
@@ -20,6 +25,11 @@
         label="Data"
         :value="formattedDate(formattedEvent.Schedule.dateHour)"
         :blocked="true"
+        additionalClasses="text--white teleconsultation-input q-mb-sm"
+        label-color="white"
+        bg-color="primary"
+        filled
+        dense
       />
     </div>
     <div class="col-xs-6 col-sm-3 col-md-3">
@@ -27,6 +37,11 @@
         label="Hora"
         :value="formattedHour(formattedEvent.Schedule.dateHour)"
         :blocked="true"
+        additionalClasses="text--white teleconsultation-input q-mb-sm"
+        label-color="white"
+        bg-color="primary"
+        filled
+        dense
       />
     </div>
     <div class="col-xs-12 col-sm-3 col-md-3">
@@ -38,6 +53,7 @@
           icon="eva-edit"
           outline
           :disable="!isAbbleToChangeEvent(formattedEvent.Schedule.status)"
+          size="sm"
         />
         <q-btn
           @click="confirmRemoveEvent(formattedEvent)"
@@ -47,6 +63,20 @@
           icon="eva-trash"
           outline
           :disable="!isAbbleToChangeEvent(formattedEvent.Schedule.status)"
+          size="sm"
+        />
+        <q-btn
+          @click="openVideoConference(formattedEvent)"
+          color="purple"
+          class="q-ml-sm"
+          no-caps
+          icon="eva-video-outline"
+          outline
+          v-show="
+            formattedEvent.Schedule.type === 'teleconsulta' &&
+              isAbbleToAccessTeleconsult(formattedEvent.Schedule.status)
+          "
+          size="sm"
         />
       </div>
     </div>
@@ -91,6 +121,44 @@ export default {
     formattedHour,
     isAbbleToChangeEvent(status) {
       return ['pending'].includes(status);
+    },
+    isAbbleToAccessTeleconsult(status) {
+      return ['soon'].includes(status);
+    },
+    async openVideoConference(formattedEvent) {
+      const professional = formattedEvent.Schedule.ScheduleUsers.find(
+        user => user.User.roles === 'professional',
+      );
+      if (!professional) {
+        return this.$q.notify({
+          message: 'Erro ao abrir a teleconsulta, converse com o profissional no Chat',
+          color: 'negative',
+        });
+      }
+      this.$q.loading.show();
+      try {
+        const conferenceUrlResponse = await this.$store.dispatch(
+          'professionals/getProfessionalConferenceUrl',
+          professional.userId,
+        );
+        if (!conferenceUrlResponse || !conferenceUrlResponse.url) {
+          this.$q.notify({
+            message: 'Erro ao abrir a teleconsulta, converse com o profissional no Chat',
+            color: 'negative',
+          });
+        } else {
+          window.open(conferenceUrlResponse.url, 'Consulta Arvorah', 'width=500,height=400');
+        }
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao abrir a teleconsulta, converse com o profissional no Chat',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+      return 1;
     },
     getEventStatusDescription(status) {
       switch (status) {
@@ -184,4 +252,11 @@ export default {
 };
 </script>
 
-<style></style>
+<style lang="sass">
+.teleconsultation-input > .q-field__inner > .q-field__control
+  border-radius: 5px !important
+
+.teleconsultation-input input
+  color: white
+  font-weight: bolder
+</style>

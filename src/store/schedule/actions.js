@@ -2,8 +2,8 @@ import SchedulesApi from '../../api/schedule';
 
 const schedulesApi = new SchedulesApi();
 
-export async function getUserSchedules() {
-  const response = await schedulesApi.getSchedules();
+export async function getUserSchedules(_, params = {}) {
+  const response = await schedulesApi.getSchedules(params);
   return response;
 }
 
