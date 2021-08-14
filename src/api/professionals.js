@@ -11,6 +11,12 @@ class ProfessionalsApi extends CrudApi {
   getAreas() {
     return this.axiosInstance.get('areas').then(r => r.data);
   }
+
+  getProfessionalConferenceUrl(professionalUserId) {
+    return this.axiosInstance
+      .get(`professionals/conference-url/${professionalUserId}`)
+      .then(r => r.data);
+  }
 }
 
 export default ProfessionalsApi;

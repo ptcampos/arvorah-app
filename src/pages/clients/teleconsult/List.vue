@@ -37,12 +37,12 @@
             /> -->
             <q-input
               label-color="white"
-              bg-color="primary"
               label="Profissional"
+              bg-color="primary"
               class="text--white teleconsultation-input q-mb-sm"
               filled
-              readonly
               dense
+              readonly
               v-model="teleconsultation.Schedule.ScheduleUsers[1].User.fullName"
             />
             <div class="row justify-between">
@@ -183,7 +183,9 @@ export default {
 
   methods: {
     async getTeleconsultations() {
-      const { result } = await this.$store.dispatch('schedule/getUserSchedules');
+      const { result } = await this.$store.dispatch('schedule/getUserSchedules', {
+        type: 'teleconsulta',
+      });
       this.teleconsultations = result;
       this.loading = false;
     },

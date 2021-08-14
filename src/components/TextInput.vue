@@ -11,14 +11,33 @@
     :ref="referencia"
     hide-bottom-space
     :rules="[val => !!checkRequired(val) || 'Campo obrigatório', ...aditionalRules]"
-    bg-color="grey-2"
     :readonly="blocked"
+    :labelColor="labelColor"
+    :bg-color="bgColor || 'grey-2'"
+    :filled="filled"
+    :class="additionalClasses"
   />
 </template>
 
 <script>
 export default {
   props: {
+    additionalClasses: {
+      type: String,
+      required: false,
+    },
+    labelColor: {
+      type: String,
+      required: false,
+    },
+    bgColor: {
+      type: String,
+      required: false,
+    },
+    filled: {
+      type: Boolean,
+      required: false,
+    },
     label: {
       type: String,
       required: false,

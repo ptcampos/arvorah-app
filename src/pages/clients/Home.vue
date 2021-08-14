@@ -86,6 +86,7 @@
           <q-card-section v-show="currentCycle.startDate">
             <div class="text-subtitle q-mb-sm text-primary">Últimos Conteúdos:</div>
             <InformativeContentList @onClickItem="onClickContent" :contents="cycleCronogram" />
+            <q-skeleton v-show="loadingCycleCronogram" animation="pulse" />
           </q-card-section>
         </q-card>
       </div>
@@ -342,6 +343,7 @@ export default {
     return {
       conferenceModal: false,
       proReportModal: false,
+      loadingCycleCronogram: true,
       proReport: null,
       clientProReport: {},
       conference: {
@@ -737,6 +739,7 @@ export default {
     },
     async refreshCycleCronogram() {
       this.$q.loading.show();
+      this.loadingCycleCronogram = true;
       try {
         const cycleCronogram = await this.$store.dispatch(
           'cycle/getCycleCronogram',
@@ -745,9 +748,6 @@ export default {
         console.log(cycleCronogram);
         // available contents
         const availableContents = cycleCronogram.sort((a, b) => (a.date > b.date ? -1 : 1));
-        // const notAvailableContents = cycleCronogram
-        //   .filter(c => !c.released)
-        //   .sort((a, b) => (a.date > b.date ? 1 : -1));
         this.cycleCronogram = [...availableContents];
       } catch (error) {
         // console.log(error);
@@ -757,6 +757,7 @@ export default {
         });
       } finally {
         this.$q.loading.hide();
+        this.loadingCycleCronogram = false;
       }
     },
     async getProfessionalCycle() {
