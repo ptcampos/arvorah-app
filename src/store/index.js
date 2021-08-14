@@ -3,6 +3,8 @@ import Vuex from 'vuex';
 
 import user from './user';
 import cycle from './cycle';
+import schedule from './schedule';
+import professionals from './professionals';
 import informativeContent from './informative-content';
 
 Vue.use(Vuex);
@@ -22,6 +24,8 @@ export default function(/* { ssrContext } */) {
       user,
       cycle,
       informativeContent,
+      schedule,
+      professionals,
     },
 
     // enable strict mode (adds overhead!)
