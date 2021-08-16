@@ -98,7 +98,13 @@
 </template>
 
 <script>
-import { formattedEventType, formattedDate, formattedHour } from 'boot/utils';
+import {
+  formattedEventType,
+  formattedDate,
+  formattedHour,
+  getEventStatusDescription,
+  getEventStatusColor,
+} from 'boot/utils';
 import TextInput from 'components/TextInput';
 
 export default {
@@ -119,6 +125,8 @@ export default {
     formattedEventType,
     formattedDate,
     formattedHour,
+    getEventStatusDescription,
+    getEventStatusColor,
     isAbbleToChangeEvent(status) {
       return ['pending'].includes(status);
     },
@@ -159,34 +167,6 @@ export default {
         this.$q.loading.hide();
       }
       return 1;
-    },
-    getEventStatusDescription(status) {
-      switch (status) {
-        case 'pending':
-          return 'Pendente';
-        case 'canceled':
-          return 'Cancelado';
-        case 'occurred':
-          return 'Já ocorreu';
-        case 'soon':
-          return 'Em Breve';
-        default:
-          return status;
-      }
-    },
-    getEventStatusColor(status) {
-      switch (status) {
-        case 'pending':
-          return 'primary';
-        case 'canceled':
-          return 'negative';
-        case 'occurred':
-          return 'positive';
-        case 'soon':
-          return 'purple';
-        default:
-          return 'black';
-      }
     },
     confirmRemoveEvent(schedule) {
       this.scheduleToRemoveId = schedule.Schedule.id;
