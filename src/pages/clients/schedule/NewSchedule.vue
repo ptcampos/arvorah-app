@@ -36,15 +36,6 @@
             </div>
           </div>
         </q-card-section>
-        <q-card-section class="row justify-center">
-          <q-btn
-            type="submit"
-            class="full-width"
-            color="primary"
-            label="Agendar novo compromisso"
-            no-caps
-          />
-        </q-card-section>
       </q-card>
     </q-form>
   </q-page>
