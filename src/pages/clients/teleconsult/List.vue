@@ -95,6 +95,16 @@
               dense
             />
           </div>
+          <div v-if="teleconsultation.Schedule.status === 'soon'" class="col-xs-12">
+            <q-btn
+              style="width: 100%;"
+              color="primary"
+              label="Acessar consulta"
+              no-caps
+              dense
+              @click="getConferenceUrl(teleconsultation.Schedule.ScheduleUsers[1].UserId)"
+            />
+          </div>
           <div class="col-xs-11">
             <hr />
           </div>
@@ -229,6 +239,31 @@ export default {
     parseDateToHtml(date) {
       const dates = date.split('/');
       return dates.reverse().join('-');
+    },
+    async getConferenceUrl(professionalId) {
+      this.$q.loading.show();
+      try {
+        const conferenceUrlResponse = await this.$store.dispatch(
+          'professionals/getProfessionalConferenceUrl',
+          professionalId,
+        );
+        if (!conferenceUrlResponse || !conferenceUrlResponse.url) {
+          this.$q.notify({
+            message: 'Erro ao abrir a teleconsulta, converse com o profissional no Chat',
+            color: 'negative',
+          });
+        } else {
+          window.open(conferenceUrlResponse.url, 'Consulta Arvorah', 'width=500,height=400');
+        }
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao abrir a teleconsulta, converse com o profissional no Chat',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
     },
   },
 };
