@@ -303,3 +303,25 @@ export const formattedDate = dateHour => {
 export const formattedHour = dateHour => {
   return moment(dateHour).format('HH:mm');
 };
+
+export const getEventStatusDescription = status => {
+  const descriptionByStatus = {
+    pending: 'Pendente',
+    canceled: 'Cancelado',
+    occurred: 'Já ocorreu',
+    soon: 'Em Breve',
+  };
+
+  return descriptionByStatus[status] || status;
+};
+
+export const getEventStatusColor = status => {
+  const colorsByStatus = {
+    pending: 'primary',
+    canceled: 'negative',
+    occurred: 'positive',
+    soon: 'purple',
+  };
+
+  return colorsByStatus[status] || 'black';
+};

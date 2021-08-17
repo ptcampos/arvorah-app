@@ -12,19 +12,27 @@
         </q-inner-loading>
       </div>
     </div>
-    <div v-if="!loading && filteredTeleconsultations.length == 0" class="row q-col-gutter-md">
+    <div v-if="!loading && teleconsultations.length == 0" class="row q-col-gutter-md">
       <div class="col-xs-12 text-center primary--text">
         <h6>Você não tem nenhuma teleconsulta agendada.</h6>
       </div>
     </div>
     <div v-else-if="!loading" class="row q-mx-sm">
       <div
-        v-for="(teleconsultation, i) in filteredTeleconsultations"
+        v-for="(teleconsultation, i) in teleconsultations"
         :key="`teleconsultation-${i}`"
         class="col-xs-12 q-mb-md justify-start"
       >
         <div class="row justify-center">
           <div class="col-xs-8">
+            <q-chip
+              :color="getEventStatusColor(teleconsultation.Schedule.status)"
+              text-color="white"
+              icon="event"
+              style="margin-left: -2px"
+            >
+              {{ getEventStatusDescription(teleconsultation.Schedule.status) }}
+            </q-chip>
             <!-- <q-input
               label-color="white"
               bg-color="primary"
@@ -151,6 +159,7 @@
 
 <script>
 import moment from 'moment';
+import { getEventStatusDescription, getEventStatusColor } from 'boot/utils';
 
 export default {
   components: {},
@@ -192,6 +201,8 @@ export default {
   },
 
   methods: {
+    getEventStatusDescription,
+    getEventStatusColor,
     async getTeleconsultations() {
       const { result } = await this.$store.dispatch('schedule/getUserSchedules', {
         type: 'teleconsulta',
