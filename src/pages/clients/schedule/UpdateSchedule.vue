@@ -1,15 +1,16 @@
 <template>
   <q-page>
-    <q-form @submit="doSchedule">
+    <q-form>
       <q-card>
         <q-card-section>
-          <div class="q-pa-sm q-pl-md text-h6">Atualizar um compromisso</div>
+          <div class="q-pa-sm q-pl-md text-h6">Atualizar compromisso</div>
         </q-card-section>
         <q-separator />
         <q-card-section>
           <div class="row q-col-gutter-sm">
             <div class="col-12">
               <SelectInput
+                v-if="schedule.Schedule"
                 label="Tipo de Compromisso"
                 :options="[
                   {
@@ -25,19 +26,22 @@
                     value: 'outra-atividade',
                   },
                 ]"
-                v-model="schedule.type"
+                v-model="schedule.Schedule.type"
                 @change="clearOthers"
               />
             </div>
             <div class="col-12">
-              <ScheduleTeleconsult :schedule="schedule" v-if="schedule.type === 'teleconsulta'" />
-              <ScheduleExam :schedule="schedule" v-if="schedule.type === 'exame'" />
-              <ScheduleActivity :schedule="schedule" v-if="schedule.type === 'outra-atividade'" />
+              <ScheduleTeleconsult
+                :schedule="schedule"
+                v-if="schedule.Schedule.type === 'teleconsulta'"
+              />
+              <ScheduleExam :schedule="schedule" v-if="schedule.Schedule.type === 'exame'" />
+              <ScheduleActivity
+                :schedule="schedule"
+                v-if="schedule.Schedule.type === 'outra-atividade'"
+              />
             </div>
           </div>
-        </q-card-section>
-        <q-card-section class="row justify-center">
-          <q-btn type="submit" color="primary" label="Atualizar novo compromisso" no-caps />
         </q-card-section>
       </q-card>
     </q-form>
@@ -79,15 +83,10 @@ export default {
     async init() {
       this.$q.loading.show();
       try {
-        const userSchedules = await this.$axios
-          .get('schedule/user-schedules')
-          .then(r => r.data)
-          .then(r => r.result);
-        const schedule = userSchedules.find(s => parseInt(s.id, 10) === parseInt(this.id, 10));
-        // this.schedule = {
-        //   ...schedule,
-        // };
-        console.log(schedule);
+        const { result } = await this.$store.dispatch('schedule/getUserSchedules');
+
+        const schedule = result.find(s => parseInt(s.id, 10) === parseInt(this.id, 10));
+        this.schedule = schedule;
       } catch (error) {
         console.log(error);
         this.$q.notify({
