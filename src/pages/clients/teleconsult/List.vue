@@ -240,6 +240,7 @@ export default {
         message: 'Sua teleconsulta foi cancelada com sucesso',
         color: 'positive',
       });
+      this.getTeleconsultations();
     },
     getDate(date) {
       return moment(date).format('DD/MM/YYYY');
