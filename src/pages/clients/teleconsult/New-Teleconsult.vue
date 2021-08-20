@@ -24,12 +24,21 @@
           filled
           v-model="newTeleconsultation.professionalId"
           :options="professionals"
+          @input="filterDateSuggestions"
           option-value="id"
           option-label="nickname"
           label="Profissional"
         />
       </div>
-      <div class="col-xs-6 text-center primary--text">
+      <div class="col-xs-12 q-mb-md text-center primary--text">
+        <SelectInput
+          :required="true"
+          :options="dateSuggestions"
+          label="Horário"
+          v-model="selectedDateHour"
+        />
+      </div>
+      <!-- <div class="col-xs-6 text-center primary--text">
         <q-input
           filled
           v-model="newTeleconsultation.date"
@@ -59,7 +68,7 @@
             </q-icon>
           </template>
         </q-input>
-      </div>
+      </div> -->
     </div>
     <div class="col-xs-6 text-center primary--text">
       <q-btn
@@ -75,25 +84,67 @@
 </template>
 
 <script>
+import SelectInput from 'components/SelectInput';
 import moment from 'moment';
 
 export default {
+  components: {
+    SelectInput,
+  },
   data() {
     return {
       loading: true,
       healthAreas: [],
       professionals: [],
       selectedArea: null,
+      selectedDateHour: '',
       newTeleconsultation: {
         date: new Date(),
         hour: '',
       },
+      dateSuggestions: [
+        {
+          label: '[ Selecione um horário ]',
+          value: '',
+        },
+      ],
     };
   },
   mounted() {
     this.getHealthAreas();
+    moment.locale('pt-br');
   },
   methods: {
+    async filterDateSuggestions(professional) {
+      this.$q.loading.show();
+      try {
+        const dateSuggestions = await this.$axios
+          .get(`/professional-cycle/get-professional-calendar-suggestion/${professional.id}`)
+          .then(r => r.data)
+          .then(r => r.result);
+        const emptyDate = [
+          {
+            label: '[ Selecione um horário ]',
+            value: '',
+          },
+        ];
+        this.dateSuggestions = [
+          ...emptyDate,
+          ...dateSuggestions.map(d => ({
+            label: `${d.date} - ${d.hour}`,
+            value: `${d.date}_${d.hour}`,
+          })),
+        ];
+      } catch (error) {
+        console.log(error);
+        this.$q.notify({
+          message: 'Erro ao carregar os horários disponíveis',
+          color: 'negative',
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
     async getHealthAreas() {
       const result = await this.$store.dispatch('professionals/getAreas');
       const areas = Object.entries(result).map(item => {
@@ -113,8 +164,16 @@ export default {
     async saveTeleconsultation() {
       this.$q.loading.show();
       try {
+        // newTeleconsultation
+        // moment.locale('pt-br');
+        const { selectedDateHour } = this;
+        const arrSelected = selectedDateHour.split('_');
+        const [date, hour] = arrSelected;
+        this.newTeleconsultation.date = moment(date, 'DD/MM/YYYY').toDate();
+        this.newTeleconsultation.hour = hour;
         await this.$store.dispatch('schedule/postDirectSchedule', {
           ...this.newTeleconsultation,
+          type: 'teleconsulta',
           professionalId: this.newTeleconsultation.professionalId.id,
         });
         this.$q.notify({

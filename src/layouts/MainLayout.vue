@@ -96,11 +96,11 @@ const linksData = [
     icon: 'fas fa-home',
     link: '/app/client/home',
   },
-  {
-    title: 'Agenda',
-    icon: 'fas fa-calendar-alt',
-    link: '/app/client/agenda',
-  },
+  // {
+  //   title: 'Agenda',
+  //   icon: 'fas fa-calendar-alt',
+  //   link: '/app/client/agenda',
+  // },
   {
     title: 'Conteúdos Educativos',
     icon: 'fas fa-book-reader',
