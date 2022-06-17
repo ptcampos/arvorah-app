@@ -13,13 +13,13 @@ module.exports = function(ctx) {
   const devEnvs = {
     API_URL: 'https://api.arvorah.com.br/api/v1/',
     WORDPRESS_CONTENT_API: 'https://wordpress.arvorah.com.br',
-    PUSHER_KEY: '24cd78c672bbb9f35fcf',
+    PUSHER_KEY: '',
     // API_URL: '"https://manuais-normativos-api.thriade.com/api/v1/"'
   };
   const prodEnvs = {
     API_URL: 'https://api.arvorah.com.br/api/v1/',
     WORDPRESS_CONTENT_API: 'https://wordpress.arvorah.com.br',
-    PUSHER_KEY: '24cd78c672bbb9f35fcf',
+    PUSHER_KEY: '',
   };
 
   return {
